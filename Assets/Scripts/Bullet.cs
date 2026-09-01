@@ -1,10 +1,16 @@
 using UnityEngine;
 
 public class Bullet : MonoBehaviour {
+
+    [SerializeField] private LayerMask bounceLayer;
+    [SerializeField] private GameObject defaultVisual;
+    [SerializeField] private GameObject reflectedVisual;
+
     public float ProjectileSpeed { get; set; } = 3f;
     public float LifeTime { get; set; } = 30f;
     public float ProjectileDamage { get; set; } = 34f;
     public Vector3 Direction { get; set; }
+    public bool IsParried { get; set; }
 
     private Rigidbody rb;
 
@@ -25,7 +31,25 @@ public class Bullet : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        rb.MovePosition(rb.position + Direction * ProjectileSpeed * Time.fixedDeltaTime);
+        float moveDistance = ProjectileSpeed * Time.fixedDeltaTime;
+
+        if(Physics.Raycast(rb.position, Direction, out RaycastHit raycastHit, moveDistance, bounceLayer)) {
+            Direction = Vector3.Reflect(Direction, raycastHit.normal).normalized;
+            rb.position = raycastHit.point;
+        }
+        else {
+            rb.MovePosition(rb.position + Direction * moveDistance);
+        }
+
+    }
+
+    public void BeParried(Vector3 newDirection, float projectileSpeed = 3f) {
+        Direction = newDirection;
+        ProjectileSpeed = projectileSpeed;
+        IsParried = true;
+
+        defaultVisual.SetActive(false);
+        reflectedVisual.SetActive(true);
     }
 
 }

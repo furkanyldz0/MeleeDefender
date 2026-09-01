@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour, IDamagable
     public float Health { get; set; } = 100f;
     public bool IsSpawning { get; set; } = false;
 
-    private float attackTime = 1.5f;
+    private float attackTime = 2.5f;
     private float attackTimeDelta;
 
     private void Start()

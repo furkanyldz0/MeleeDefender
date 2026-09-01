@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
 
     private bool canDash = true;
     private bool isDashing;
-    private float dashingPower = 25f;
+    private float dashingPower = 30f;
     private float dashingTime = 0.05f;
     private float dashingCooldown = 0f;
 
@@ -40,11 +40,40 @@ public class Player : MonoBehaviour
 
         HandleMovement();
         HandleAttack();
+        LookAtMouse();
 
         if(Input.GetKeyDown(KeyCode.LeftShift) && canDash) {
             StartCoroutine(Dash());
         }
     }
+
+    private void LookAtMouse() {
+        Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, transform.position);
+        //ray'in sadece düzlem ile çarpýþmasýna bakýyor
+        if (plane.Raycast(mouseRay, out float hitDist)) { //hitdist ray'in uzunluðu, getpoint ile çarptýðý yerin kordinatýný alýyoruz
+            Vector3 hitPoint = mouseRay.GetPoint(hitDist);
+
+            Vector3 lookDirection = hitPoint - transform.position;
+            lookDirection.y = 0f;
+
+            if (lookDirection != Vector3.zero) {
+                // Yönü rotasyona çevir ve Rigidbody'e "Dön" de
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                rb.MoveRotation(targetRotation);
+            }
+        }
+    }
+
+    //private void LookAtMouse() {
+    //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //    Plane plane = new Plane(Vector3.up, transform.position);
+    //    //ray'in sadece düzlem ile çarpýþmasýna bakýyor
+    //    if(plane.Raycast(mouseRay, out float hitDist)) {
+    //        Vector3 hitPoint = mouseRay.GetPoint(hitDist); //hitdist ray'in uzunluðu, getpoint ile çarptýðý yerin kordinatýný alýyoruz
+    //        transform.LookAt(hitPoint);
+    //    }
+    //}
 
     private IEnumerator Dash() {
         Vector2 inputVector = GetMovementVector2Normalized();
@@ -69,6 +98,11 @@ public class Player : MonoBehaviour
     }
 
     private void HandleMovement() {
+        //çarpýþmadan kaynaklý sürtünme ve istenmeyen hareketleri engellemek için
+        //dash atarken metot okunmadýðý için sýkýntý yok
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
         Vector2 inputVector = GetMovementVector2Normalized();
         Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
         rb.MovePosition(rb.position + moveDir * moveSpeed * Time.fixedDeltaTime); //fixeddelta'da yazýcam 

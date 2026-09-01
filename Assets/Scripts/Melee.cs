@@ -47,11 +47,10 @@ public class Melee : MonoBehaviour {
         }
     }
 
-    private static void ParryBullet(Bullet bullet) {
-        // Mermiyi yok et (veya yönünü geri çevirme kodunu buraya yaz)
-        //Destroy(hit.gameObject);
-        bullet.Direction = Player.Instance.transform.forward;
-        bullet.ProjectileSpeed *= 5;
+    private void ParryBullet(Bullet bullet) { //düþman parrylerse deðiþiriz, þuan sadece player
+        if (!bullet.IsParried) {
+            bullet.BeParried(Player.Instance.transform.forward, bullet.ProjectileSpeed * 5);
+        }
     }
 
     private void Instance_OnAttack(object sender, System.EventArgs e) {
