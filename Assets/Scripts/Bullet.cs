@@ -38,6 +38,12 @@ public class Bullet : MonoBehaviour {
             rb.position = raycastHit.point;
         }
         else {
+            if (Direction != Vector3.zero) {
+                Quaternion targetRotation = Quaternion.LookRotation(Direction);
+
+                rb.MoveRotation(targetRotation);
+            }
+
             rb.MovePosition(rb.position + Direction * moveDistance);
         }
 

@@ -148,6 +148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2100111548713916684}
   - component: {fileID: 9171959021732085328}
+  - component: {fileID: 6427564455364694615}
   - component: {fileID: 3284754273568257948}
   m_Layer: 0
   m_Name: Enemy
@@ -186,6 +187,53 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   weapon: {fileID: 937632372575852334}
+--- !u!114 &6427564455364694615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6845519660409509915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6e1279ca05135345b41ce7cf695b6f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageFlash
+  flashColor: {r: 8, g: 8, b: 8, a: 1}
+  flashTime: 0.25
+  flashSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -7.793452
+      outSlope: -7.793452
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.106274985
+      value: 0.17175105
+      inSlope: -2.3485599
+      outSlope: -2.3485599
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.12613045
+      outWeight: 0.15859517
+    - serializedVersion: 3
+      time: 0.25
+      value: 0
+      inSlope: -1.1949977
+      outSlope: -1.1949977
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!65 &3284754273568257948
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -304,7 +352,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 88e457ee409422f4aa12269fd3efcb73, type: 2}
+  - {fileID: 2100000, guid: 2945244c33645a94baf8a10a02ab6679, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

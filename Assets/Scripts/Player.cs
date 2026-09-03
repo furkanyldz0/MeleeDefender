@@ -57,6 +57,13 @@ public class Player : MonoBehaviour
             Vector3 lookDirection = hitPoint - transform.position;
             lookDirection.y = 0f;
 
+            float rotationLimit = 1f;
+            //konuma göre farenin konumunu kontrol ediyor, karakterin arkasýna düþmesi durumunda
+            if (lookDirection.z < rotationLimit) {
+                //karakterin tam arkaya dönmemesi için
+                lookDirection.z = rotationLimit + 0.001f;
+            }
+
             if (lookDirection != Vector3.zero) {
                 // Yönü rotasyona çevir ve Rigidbody'e "Dön" de
                 Quaternion targetRotation = Quaternion.LookRotation(lookDirection);

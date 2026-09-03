@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour, IDamagable
@@ -13,8 +14,12 @@ public class Enemy : MonoBehaviour, IDamagable
     private float attackTime = 2.5f;
     private float attackTimeDelta;
 
+    private DamageFlash damageFlash;
+
     private void Start()
     {
+        damageFlash = GetComponent<DamageFlash>();
+
         attackTimeDelta = attackTime;
     }
 
@@ -32,9 +37,17 @@ public class Enemy : MonoBehaviour, IDamagable
 
     public void Damage(float DamageAmount) {
         Health -= DamageAmount;
+
         if (Health <= 0) {
-            Die();
+            StartCoroutine(DelayDie(0.15f));
         }
+
+        damageFlash.CallDamageFlash();
+    }
+
+    private IEnumerator DelayDie(float duration) {
+        yield return new WaitForSeconds(duration);
+        Die();
     }
 
     private void Die() {

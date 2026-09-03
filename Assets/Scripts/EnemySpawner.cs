@@ -7,7 +7,7 @@ public class EnemySpawnter : MonoBehaviour
     [SerializeField] private Enemy enemyPrefab;
 
     [SerializeField] private float horizontalSpace = 1.1f;
-    [SerializeField] private float verticalPosition = 5f;
+    [SerializeField] private float verticalPosition = 7f;
     [SerializeField] private Vector2 horizontalPositionRange = new Vector2(-4f, 4f);
 
     [SerializeField] private int enemySpawnCount = 10;
