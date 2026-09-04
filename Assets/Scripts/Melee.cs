@@ -1,4 +1,5 @@
 using DG.Tweening;
+using INab.Common;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -67,8 +68,12 @@ public class Melee : MonoBehaviour {
             })
             .SetEase(Ease.OutQuad)
             .SetTarget(transform)
-            .OnStart(() => EnableHitbox())
-            .OnComplete(() => DisableHitbox());
+            .OnStart(() => {
+                EnableHitbox();
+            })
+            .OnComplete(() => {
+                DisableHitbox();
+            });
 
             comboStep = 2;
         }
@@ -79,8 +84,13 @@ public class Melee : MonoBehaviour {
             })
             .SetEase(Ease.OutQuad)
             .SetTarget(transform)
-            .OnStart(() => EnableHitbox())
-            .OnComplete(() => DisableHitbox());
+            .OnStart(() => {
+                EnableHitbox();
+
+            })
+            .OnComplete(() => {
+                DisableHitbox();
+            });
 
             comboStep = 1;
         }

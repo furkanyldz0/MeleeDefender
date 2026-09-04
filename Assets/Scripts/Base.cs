@@ -3,17 +3,34 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Base : MonoBehaviour, IDamagable {
+public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
+
+    public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
+
     public float Health { get; set; } = 300f;
+    private float currentHealth;
 
     private DamageFlash damageFlash;
+
     private void Start() {
         damageFlash = GetComponent<DamageFlash>();
+
+        currentHealth = Health;
+
+        OnHealthChanged.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
+            currentHealthNormalized = currentHealth / Health
+        }); //baþta can barýný gizlesin
     }
 
     public void Damage(float damageAmount) {
-        Health -= damageAmount;
-        if(Health <= 0f) {
+        currentHealth -= damageAmount;
+
+        OnHealthChanged.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs { 
+            currentHealthNormalized = currentHealth / Health
+        });
+        Debug.Log(currentHealth / Health);
+
+        if(currentHealth <= 0f) {
             StartCoroutine(DelayDie(0.15f));
         }
 
