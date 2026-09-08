@@ -17,7 +17,7 @@ public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
 
         currentHealth = Health;
 
-        OnHealthChanged.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
+        OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
             currentHealthNormalized = currentHealth / Health
         }); //baþta can barýný gizlesin
     }

@@ -361,7 +361,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
@@ -413,7 +413,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -522,6 +522,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3910672252282361167, guid: adf3dcaf560a0a747846003da8b8c8e2, type: 3}
   m_PrefabInstance: {fileID: 5039454489833381299}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &769353685
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 769353686}
+  - component: {fileID: 769353687}
+  m_Layer: 0
+  m_Name: HitStop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &769353686
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769353685}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1534048941}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &769353687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769353685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f820a38116537294c9fb64e2db8ab836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitStop
 --- !u!1 &783709480
 GameObject:
   m_ObjectHideFlags: 0
@@ -951,6 +995,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 429434244}
+  - {fileID: 769353686}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1570735953
@@ -1399,6 +1444,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1707302879}
     m_Modifications:
+    - target: {fileID: 2458268110492867303, guid: adf3dcaf560a0a747846003da8b8c8e2, type: 3}
+      propertyPath: slashEffect
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2458268110492867303, guid: adf3dcaf560a0a747846003da8b8c8e2, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 6730190029751671503, guid: 74726fb675423134f95ab633f8bbdbd0, type: 3}
     - target: {fileID: 3283756291947464107, guid: adf3dcaf560a0a747846003da8b8c8e2, type: 3}
       propertyPath: m_Name
       value: Melee

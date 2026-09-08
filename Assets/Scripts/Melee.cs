@@ -1,5 +1,5 @@
 using DG.Tweening;
-using INab.Common;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +9,7 @@ public class Melee : MonoBehaviour {
     [SerializeField] private Transform hitboxCenter;
     [SerializeField] private Vector3 hitboxSize = new Vector3(1f, 2f, 1f);
     [SerializeField] private LayerMask bulletLayer;
+    [SerializeField] private ParticleSystem impactEffect;
 
     private Vector3 defaultLocalRotation;
     private int comboStep = 1;
@@ -41,7 +42,11 @@ public class Melee : MonoBehaviour {
 
                 if(hit.TryGetComponent<Bullet>(out Bullet bullet)) {
                     //Debug.Log("Mermiye vuruldu: " + bullet.name);
-                    ParryBullet(bullet);
+                    if (!bullet.IsParried) {
+                        ParryBullet(bullet);
+                        PlayImpactEffect(bullet.transform.position);
+                        HitStop.Instance.StopTime(0.02f);
+                    }
                 }
                 
             }
@@ -49,9 +54,7 @@ public class Melee : MonoBehaviour {
     }
 
     private void ParryBullet(Bullet bullet) { //düþman parrylerse deðiþiriz, þuan sadece player
-        if (!bullet.IsParried) {
-            bullet.BeParried(Player.Instance.transform.forward, bullet.ProjectileSpeed * 5);
-        }
+        bullet.BeParried(Player.Instance.transform.forward, bullet.ProjectileSpeed * 5);
     }
 
     private void Instance_OnAttack(object sender, System.EventArgs e) {
@@ -101,8 +104,15 @@ public class Melee : MonoBehaviour {
             .OnComplete(() => {
                 comboStep = 1;
             });
+
     }
 
+    private void PlayImpactEffect(Vector3 position) {
+        var effect = Instantiate(impactEffect, position, Quaternion.identity);
+
+        Destroy(effect.gameObject, 1f);
+    }
+    
     private void EnableHitbox() {
         alreadyHitBullets.Clear();
         isHitboxActive = true;

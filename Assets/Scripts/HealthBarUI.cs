@@ -8,13 +8,13 @@ public class HealthBarUI : MonoBehaviour
 
     private IHasHealthBar hasHealthBar;
 
-    private void Start() {
+    private void Awake() {
         hasHealthBar = hasHealthBarGameObject.GetComponent<IHasHealthBar>();
 
         if(hasHealthBar == null) {
             Debug.LogError(this + "IHasHealthBar interface'ini uygulamýyor!");
         }
-
+        
         hasHealthBar.OnHealthChanged += HasHealthBar_OnHealthChanged;
     }
 
