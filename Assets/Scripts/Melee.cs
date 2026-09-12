@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Melee : MonoBehaviour {
@@ -10,19 +11,22 @@ public class Melee : MonoBehaviour {
     [SerializeField] private Vector3 hitboxSize = new Vector3(1f, 2f, 1f);
     [SerializeField] private LayerMask bulletLayer;
     [SerializeField] private ParticleSystem impactEffect;
-
-    private Vector3 defaultLocalRotation;
+    [SerializeField] private Transform trailRendererParent;
+        
     private int comboStep = 1;
 
     private bool isHitboxActive = false;
     private List<Collider> alreadyHitBullets = new List<Collider>();
     private float attackDuration = 0.1f;
 
-    private void Start() {
-        defaultLocalRotation = transform.localEulerAngles;
+    private List<TrailRenderer> trails = new List<TrailRenderer>();    
 
-        if (Player.Instance != null)
-            Player.Instance.OnAttack += Instance_OnAttack;
+    private void Start() {
+        Player.Instance.OnAttack += Instance_OnAttack;
+
+        trails = GetComponentsInChildren<TrailRenderer>().ToList();
+
+        DisableTrails();
     }
 
     private void Update() {
@@ -54,15 +58,22 @@ public class Melee : MonoBehaviour {
     }
 
     private void ParryBullet(Bullet bullet) { //düþman parrylerse deðiþiriz, þuan sadece player
-        bullet.BeParried(Player.Instance.transform.forward, bullet.ProjectileSpeed * 5);
+        float parriedBulletSpeed = bullet.ProjectileSpeed * 5f;
+
+        float turnSpeedMultiplier = 0.03f;
+        float extraSpeedFromTurn = Player.Instance.CurrentTurnSpeed * turnSpeedMultiplier;
+        float finalBulletSpeed = (bullet.ProjectileSpeed * 5f) + extraSpeedFromTurn;
+
+        float damageMultiplier = finalBulletSpeed / parriedBulletSpeed;
+        damageMultiplier = Mathf.Clamp(damageMultiplier, 1f, 5f);
+
+        Debug.Log(this + " hasar çarpaný: " + damageMultiplier);
+
+        bullet.BeParried(Player.Instance.transform.forward, finalBulletSpeed, damageMultiplier);
     }
 
     private void Instance_OnAttack(object sender, System.EventArgs e) {
         transform.DOKill();
-
-        if (transform.localEulerAngles == defaultLocalRotation) {
-            transform.localEulerAngles = new Vector3(0f, 0f, -90f);
-        }
 
         if (comboStep == 1) {
             // Attack 1: OnStart ve OnComplete ile Hitbox'ý senkronize et
@@ -73,9 +84,11 @@ public class Melee : MonoBehaviour {
             .SetTarget(transform)
             .OnStart(() => {
                 EnableHitbox();
+                EnableTrails();
             })
             .OnComplete(() => {
                 DisableHitbox();
+                DisableTrails();
             });
 
             comboStep = 2;
@@ -89,22 +102,16 @@ public class Melee : MonoBehaviour {
             .SetTarget(transform)
             .OnStart(() => {
                 EnableHitbox();
+                EnableTrails();
 
             })
             .OnComplete(() => {
                 DisableHitbox();
+                DisableTrails();
             });
 
             comboStep = 1;
         }
-
-        transform.DOLocalRotate(defaultLocalRotation, 0.3f)
-            .SetDelay(2.0f)
-            .SetEase(Ease.InOutSine)
-            .OnComplete(() => {
-                comboStep = 1;
-            });
-
     }
 
     private void PlayImpactEffect(Vector3 position) {
@@ -120,6 +127,17 @@ public class Melee : MonoBehaviour {
 
     private void DisableHitbox() {
         isHitboxActive = false;
+    }
+
+    private void EnableTrails() {
+        foreach(TrailRenderer t in trails) {
+            t.emitting = true;
+        }
+    }
+    private void DisableTrails() {
+        foreach (TrailRenderer t in trails) {
+            t.emitting = false;
+        }
     }
 
     // Scene ekranýnda Hitbox'ý mavi yarý saydam bir kutu olarak görmek için

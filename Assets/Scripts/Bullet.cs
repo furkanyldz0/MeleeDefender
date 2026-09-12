@@ -7,7 +7,7 @@ public class Bullet : MonoBehaviour {
     [SerializeField] private GameObject reflectedVisual;
 
     public float ProjectileSpeed { get; set; } = 3f;
-    public float LifeTime { get; set; } = 30f;
+    public float LifeTime { get; set; } = 20f;
     public float ProjectileDamage { get; set; } = 34f;
     public Vector3 Direction { get; set; }
     public bool IsParried { get; set; }
@@ -49,9 +49,10 @@ public class Bullet : MonoBehaviour {
 
     }
 
-    public void BeParried(Vector3 newDirection, float projectileSpeed = 3f) {
+    public void BeParried(Vector3 newDirection, float newProjectileSpeed, float damageMultiplier) {
         Direction = newDirection;
-        ProjectileSpeed = projectileSpeed;
+        ProjectileSpeed = newProjectileSpeed;
+        ProjectileDamage *= damageMultiplier;
         IsParried = true;
 
         defaultVisual.SetActive(false);

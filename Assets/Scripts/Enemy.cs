@@ -2,15 +2,17 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour, IDamagable
+public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 {
     public event Action<Enemy> OnDied;
+    public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
 
     [SerializeField] private Weapon weapon;
 
     public float Health { get; set; } = 100f;
     public bool IsSpawning { get; set; } = false;
 
+    private float maxHealth;
     private float attackTime = 2.5f;
     private float attackTimeDelta;
 
@@ -20,7 +22,12 @@ public class Enemy : MonoBehaviour, IDamagable
     {
         damageFlash = GetComponent<DamageFlash>();
 
+        maxHealth = Health;
         attackTimeDelta = attackTime;
+
+        OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
+            currentHealthNormalized = Health / maxHealth
+        });
     }
 
     
@@ -37,6 +44,9 @@ public class Enemy : MonoBehaviour, IDamagable
 
     public void Damage(float DamageAmount) {
         Health -= DamageAmount;
+        OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
+            currentHealthNormalized = Health / maxHealth
+        });
 
         if (Health <= 0) {
             StartCoroutine(DelayDie(0.15f));

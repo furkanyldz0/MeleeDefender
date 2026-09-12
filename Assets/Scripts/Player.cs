@@ -7,9 +7,11 @@ public class Player : MonoBehaviour
     public event EventHandler OnAttack;
 
     public static Player Instance { get; private set; }
-    
+
+    public float CurrentTurnSpeed { get; private set; } //dönüþ hýzýný parry'lenen mermilere eklemek için
+
     private Rigidbody rb;
-    private float moveSpeed = 2f;
+    private float moveSpeed = 5f;
     private int currentXDirection = 0;
 
     private bool canDash = true;
@@ -17,6 +19,9 @@ public class Player : MonoBehaviour
     private float dashingPower = 30f;
     private float dashingTime = 0.05f;
     private float dashingCooldown = 0f;
+
+    private Quaternion lastFrameRotation; // Bir önceki karenin açýsý
+    
 
     private void Awake() {
         if(Instance != null) {
@@ -38,13 +43,35 @@ public class Player : MonoBehaviour
             return;
         }
 
-        HandleMovement();
-        HandleAttack();
-        LookAtMouse();
-
-        if(Input.GetKeyDown(KeyCode.LeftShift) && canDash) {
+        if (Input.GetMouseButtonDown(0)) {
+            Attack();
+        }
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash) {
             StartCoroutine(Dash());
         }
+
+    }
+
+    private void FixedUpdate() {
+        if (isDashing) {
+            return;
+        }
+
+        HandleMovement();
+        LookAtMouse();
+        CalculateRotationSpeed();
+    }
+
+    private void CalculateRotationSpeed() {
+        // Sadece zaman akýyorsa hesaplama yap (Hata vermemesi için)
+        if (Time.fixedDeltaTime > 0f) {
+            float angleDifference = Quaternion.Angle(lastFrameRotation, rb.rotation);
+            float rawTurnSpeed = angleDifference / Time.fixedDeltaTime;
+
+            CurrentTurnSpeed = Mathf.Clamp(rawTurnSpeed, 0f, 1500f);
+        }
+
+        lastFrameRotation = rb.rotation;
     }
 
     private void LookAtMouse() {
@@ -72,16 +99,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    //private void LookAtMouse() {
-    //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-    //    Plane plane = new Plane(Vector3.up, transform.position);
-    //    //ray'in sadece düzlem ile çarpýþmasýna bakýyor
-    //    if(plane.Raycast(mouseRay, out float hitDist)) {
-    //        Vector3 hitPoint = mouseRay.GetPoint(hitDist); //hitdist ray'in uzunluðu, getpoint ile çarptýðý yerin kordinatýný alýyoruz
-    //        transform.LookAt(hitPoint);
-    //    }
-    //}
-
     private IEnumerator Dash() {
         Vector2 inputVector = GetMovementVector2Normalized();
         Vector3 dashDir = new Vector3(inputVector.x, 0, inputVector.y);
@@ -98,10 +115,8 @@ public class Player : MonoBehaviour
         //rb.useGravity = true;
     }
 
-    private void HandleAttack() {
-        if (Input.GetMouseButtonDown(0)) {
-            OnAttack?.Invoke(this, EventArgs.Empty);
-        }
+    private void Attack() {
+        OnAttack?.Invoke(this, EventArgs.Empty);
     }
 
     private void HandleMovement() {
@@ -144,4 +159,19 @@ public class Player : MonoBehaviour
 
         return inputVector;
     }
+
+
+
+
+
+
+    //private void LookAtMouse() {
+    //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //    Plane plane = new Plane(Vector3.up, transform.position);
+    //    //ray'in sadece düzlem ile çarpýþmasýna bakýyor
+    //    if(plane.Raycast(mouseRay, out float hitDist)) {
+    //        Vector3 hitPoint = mouseRay.GetPoint(hitDist); //hitdist ray'in uzunluðu, getpoint ile çarptýðý yerin kordinatýný alýyoruz
+    //        transform.LookAt(hitPoint);
+    //    }
+    //}
 }
