@@ -10,27 +10,38 @@ public class EnemySpawnter : MonoBehaviour
     [SerializeField] private float verticalPosition = 7f;
     [SerializeField] private Vector2 horizontalPositionRange = new Vector2(-4f, 4f);
 
-    [SerializeField] private int enemySpawnCount = 10;
-    [SerializeField] private int maxCurrentEnemyCount = 3;
+    [SerializeField] private int enemySpawnCount = 1000;
+    [SerializeField] private int maxCurrentEnemyCount = 2;
 
     private Vector3[] enemyPositions;
     private Dictionary<Enemy, int> occupiedEnemyPositions = new Dictionary<Enemy, int>();
 
-    int currentEnemyCount;
+    private int currentEnemyCount;
 
 
     private void Start() {
+        CalculateEnemySpace();
+
+        LevelManager.Instance.OnDifficultyChanged += LevelManager_OnDifficultyChanged;
+        CheckPositions();
+    }
+
+    private void LevelManager_OnDifficultyChanged(DifficultyTier difficultyTier) {
+        maxCurrentEnemyCount = difficultyTier.enemySpawnCount;
+    }
+
+    private void CalculateEnemySpace() {
         //düþmanlar yatay uç deðerlerde de olabileceði için +1 eklemeden eksik kalýyor
         int totalEnemyCount = (int)((horizontalPositionRange.y - horizontalPositionRange.x) / horizontalSpace) + 1;
         Debug.Log(totalEnemyCount);
 
         enemyPositions = new Vector3[totalEnemyCount];
         float tempX = horizontalPositionRange.x;
-        for(int i = 0; i < totalEnemyCount; i++) {
+        for (int i = 0; i < totalEnemyCount; i++) {
             enemyPositions[i] = new Vector3(tempX + i * horizontalSpace, 0f, verticalPosition);
         }
-        CheckPositions();
     }
+
     private void CheckPositions() {
         if (currentEnemyCount >= maxCurrentEnemyCount || enemySpawnCount <= 0)
             return;
@@ -80,12 +91,9 @@ public class EnemySpawnter : MonoBehaviour
             });
 
         occupiedEnemyPositions[enemy] = positionIndex;
-        enemy.OnDied += Enemy_OnDied;
     }
 
-    private void Enemy_OnDied(Enemy enemy) {
-        enemy.OnDied -= Enemy_OnDied;
-
+    private void Enemy_OnAnyEnemyDied(Enemy enemy) {
         if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
             occupiedEnemyPositions.Remove(enemy);
             currentEnemyCount--;
@@ -96,18 +104,7 @@ public class EnemySpawnter : MonoBehaviour
 
 
 
-    //private void CheckPositions() {
-    //    if(enemySpawnCount > 0 && currentEnemyCount < maxCurrentEnemyCount) {
-    //        for (int i = 0; i < enemyPositions.Length; i++) {
-    //            if (currentEnemyCount >= maxCurrentEnemyCount)
-    //                return;
+    private void OnEnable() => Enemy.OnAnyEnemyDied += Enemy_OnAnyEnemyDied;
+    private void OnDisable() => Enemy.OnAnyEnemyDied -= Enemy_OnAnyEnemyDied;
 
-    //            if (!occupiedEnemyPositions.ContainsValue(i)) {
-    //                SpawnEnemy(i);
-    //                enemySpawnCount--;
-    //                currentEnemyCount++;
-    //            }
-    //        }
-    //    }
-    //}
 }

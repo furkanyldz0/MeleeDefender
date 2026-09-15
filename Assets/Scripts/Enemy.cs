@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 {
-    public event Action<Enemy> OnDied;
+    public static event Action<Enemy> OnAnyEnemyDied;
     public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
 
     [SerializeField] private Weapon weapon;
@@ -30,7 +30,6 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
         });
     }
 
-    
     private void Update()
     {
         if(attackTimeDelta > 0 && !IsSpawning) {
@@ -48,7 +47,7 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
             currentHealthNormalized = Health / maxHealth
         });
 
-        if (Health <= 0) {
+        if (Health <= 10) {
             StartCoroutine(DelayDie(0.15f));
         }
 
@@ -62,6 +61,7 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 
     private void Die() {
         Destroy(gameObject);
-        OnDied?.Invoke(this);
+        OnAnyEnemyDied?.Invoke(this);
     }
+
 }

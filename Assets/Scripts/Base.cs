@@ -7,7 +7,7 @@ public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
 
     public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
 
-    public float Health { get; set; } = 300f;
+    public float Health { get; set; } = 400f;
     private float currentHealth;
 
     private DamageFlash damageFlash;

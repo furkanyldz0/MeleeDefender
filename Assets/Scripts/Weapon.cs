@@ -8,4 +8,5 @@ public class Weapon : MonoBehaviour
     public void Shoot() {
         var bullet = Instantiate(bulletPrefab, fireTransform.position, Quaternion.LookRotation(fireTransform.forward));
     }
+
 }

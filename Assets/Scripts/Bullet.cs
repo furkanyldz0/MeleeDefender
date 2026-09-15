@@ -3,6 +3,9 @@ using UnityEngine;
 public class Bullet : MonoBehaviour {
 
     [SerializeField] private LayerMask bounceLayer;
+    [SerializeField] private LayerMask hitLayer; // Hasar alabilenlerin (Düþman/Oyuncu) katmaný
+    [SerializeField] private float bulletThickness = 0.1f;
+
     [SerializeField] private GameObject defaultVisual;
     [SerializeField] private GameObject reflectedVisual;
 
@@ -12,41 +15,41 @@ public class Bullet : MonoBehaviour {
     public Vector3 Direction { get; set; }
     public bool IsParried { get; set; }
 
-    private Rigidbody rb;
-
     private void Start()
     {
         Destroy(gameObject, LifeTime);
-
         Direction = transform.forward;
 
-        rb = GetComponent<Rigidbody>();
+        ProjectileSpeed = LevelManager.Instance.CurrentDifficultyTier.bulletSpeed; //bunu weapon'dan vs. ayarlayabilirim ileride
     }
 
-    private void OnTriggerEnter(Collider col) {
-        if(col.TryGetComponent<IDamagable>(out IDamagable damagable)) {
-            damagable.Damage(ProjectileDamage);
-            Destroy(gameObject);
-        }
-    }
+    private void Update() {
+        // 1. Bu karede ne kadar ileri gideceðimizi hesapla (Akýcýlýk için Time.deltaTime)
+        float moveDistance = ProjectileSpeed * Time.deltaTime;
 
-    private void FixedUpdate() {
-        float moveDistance = ProjectileSpeed * Time.fixedDeltaTime;
-
-        if(Physics.Raycast(rb.position, Direction, out RaycastHit raycastHit, moveDistance, bounceLayer)) {
-            Direction = Vector3.Reflect(Direction, raycastHit.normal).normalized;
-            rb.position = raycastHit.point;
+        // 2. Merminin gideceði yöne doðru kalýn bir ýþýn (Küre - SphereCast) yolla.
+        // bounceLayer (Duvarlar) ve hitLayer (Düþmanlar) maskelerini ayný anda kontrol ediyoruz.
+        if (Physics.SphereCast(transform.position, bulletThickness, Direction, out RaycastHit hit, moveDistance, bounceLayer | hitLayer)) {
+            // Çarptýðýmýz obje Duvar/Sekme katmanýnda mý?
+            if ((bounceLayer.value & (1 << hit.collider.gameObject.layer)) > 0) {
+                // Mermiyi sektir
+                Direction = Vector3.Reflect(Direction, hit.normal).normalized;
+                transform.position = hit.point; // Duvara hizala
+            }
+            // Çarptýðýmýz obje sekme katmaný deðilse ve hasar alabiliyorsa
+            else if (hit.collider.TryGetComponent<IDamagable>(out IDamagable damagable)) {
+                damagable.Damage(ProjectileDamage);
+                Destroy(gameObject); // Hasar verdik, mermiyi sil
+            }
         }
         else {
+            // 3. Önümüzde hiçbir engel yoksa mermiyi manuel olarak ilerlet ve döndür
+            transform.position += Direction * moveDistance;
+
             if (Direction != Vector3.zero) {
-                Quaternion targetRotation = Quaternion.LookRotation(Direction);
-
-                rb.MoveRotation(targetRotation);
+                transform.rotation = Quaternion.LookRotation(Direction);
             }
-
-            rb.MovePosition(rb.position + Direction * moveDistance);
         }
-
     }
 
     public void BeParried(Vector3 newDirection, float newProjectileSpeed, float damageMultiplier) {

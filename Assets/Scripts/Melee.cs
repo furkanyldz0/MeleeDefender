@@ -58,18 +58,21 @@ public class Melee : MonoBehaviour {
     }
 
     private void ParryBullet(Bullet bullet) { //düþman parrylerse deðiþiriz, þuan sadece player
+        float defaultDamageMultiplier = 1.5f;
+        float speedDamageMultiplier = bullet.ProjectileSpeed * 0.1f;
+        float finalDamageMultiplier = defaultDamageMultiplier + speedDamageMultiplier;
+
         float parriedBulletSpeed = bullet.ProjectileSpeed * 5f;
 
-        float turnSpeedMultiplier = 0.03f;
-        float extraSpeedFromTurn = Player.Instance.CurrentTurnSpeed * turnSpeedMultiplier;
-        float finalBulletSpeed = (bullet.ProjectileSpeed * 5f) + extraSpeedFromTurn;
+        //float turnSpeedMultiplier = 0.03f;
+        //float extraSpeedFromTurn = Player.Instance.CurrentTurnSpeed * turnSpeedMultiplier;
+        //float finalBulletSpeed = (bullet.ProjectileSpeed * 5f) + extraSpeedFromTurn;
+        //float speedDamageMultiplier =  (finalBulletSpeed / parriedBulletSpeed) - 1;
+        //speedDamageMultiplier = Mathf.Clamp(speedDamageMultiplier, 0f, 4f);
 
-        float damageMultiplier = finalBulletSpeed / parriedBulletSpeed;
-        damageMultiplier = Mathf.Clamp(damageMultiplier, 1f, 5f);
+        Debug.Log(this + " hasar çarpaný: " + finalDamageMultiplier);
 
-        Debug.Log(this + " hasar çarpaný: " + damageMultiplier);
-
-        bullet.BeParried(Player.Instance.transform.forward, finalBulletSpeed, damageMultiplier);
+        bullet.BeParried(Player.Instance.transform.forward, parriedBulletSpeed, finalDamageMultiplier);
     }
 
     private void Instance_OnAttack(object sender, System.EventArgs e) {

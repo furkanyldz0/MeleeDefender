@@ -8,19 +8,15 @@ public class Player : MonoBehaviour
 
     public static Player Instance { get; private set; }
 
-    public float CurrentTurnSpeed { get; private set; } //dönüþ hýzýný parry'lenen mermilere eklemek için
-
     private Rigidbody rb;
     private float moveSpeed = 5f;
     private int currentXDirection = 0;
 
     private bool canDash = true;
     private bool isDashing;
-    private float dashingPower = 30f;
+    private float dashingPower = 40f;
     private float dashingTime = 0.05f;
     private float dashingCooldown = 0f;
-
-    private Quaternion lastFrameRotation; // Bir önceki karenin açýsý
     
 
     private void Awake() {
@@ -32,6 +28,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Confined; //bunu sonra bi config dosyasýnýn içine al yeri burasý deðil
         rb = GetComponent<Rigidbody>();
     }
 
@@ -59,19 +56,7 @@ public class Player : MonoBehaviour
 
         HandleMovement();
         LookAtMouse();
-        CalculateRotationSpeed();
-    }
-
-    private void CalculateRotationSpeed() {
-        // Sadece zaman akýyorsa hesaplama yap (Hata vermemesi için)
-        if (Time.fixedDeltaTime > 0f) {
-            float angleDifference = Quaternion.Angle(lastFrameRotation, rb.rotation);
-            float rawTurnSpeed = angleDifference / Time.fixedDeltaTime;
-
-            CurrentTurnSpeed = Mathf.Clamp(rawTurnSpeed, 0f, 1500f);
-        }
-
-        lastFrameRotation = rb.rotation;
+        //CalculateRotationSpeed();
     }
 
     private void LookAtMouse() {
@@ -164,6 +149,17 @@ public class Player : MonoBehaviour
 
 
 
+    //private void CalculateRotationSpeed() {
+    //    // Sadece zaman akýyorsa hesaplama yap (Hata vermemesi için)
+    //    if (Time.fixedDeltaTime > 0f) {
+    //        float angleDifference = Quaternion.Angle(lastFrameRotation, rb.rotation);
+    //        float rawTurnSpeed = angleDifference / Time.fixedDeltaTime;
+
+    //        CurrentTurnSpeed = Mathf.Clamp(rawTurnSpeed, 0f, 1500f);
+    //    }
+
+    //    lastFrameRotation = rb.rotation;
+    //}
 
     //private void LookAtMouse() {
     //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
