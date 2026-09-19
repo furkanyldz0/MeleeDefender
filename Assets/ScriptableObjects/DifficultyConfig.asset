@@ -37,3 +37,6 @@ MonoBehaviour:
   - requiredScore: 70
     enemySpawnCount: 7
     bulletSpeed: 12
+  - requiredScore: 90
+    enemySpawnCount: 8
+    bulletSpeed: 12

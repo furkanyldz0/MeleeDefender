@@ -86,6 +86,7 @@ public class EnemySpawnter : MonoBehaviour
 
         enemy.transform.DOMove(enemyPositions[positionIndex], 1f)
             .SetDelay(Random.Range(1f, 4f))
+            .SetLink(enemy.gameObject)
             .OnComplete(() => {
                 enemy.IsSpawning = false;
             });
@@ -106,5 +107,11 @@ public class EnemySpawnter : MonoBehaviour
 
     private void OnEnable() => Enemy.OnAnyEnemyDied += Enemy_OnAnyEnemyDied;
     private void OnDisable() => Enemy.OnAnyEnemyDied -= Enemy_OnAnyEnemyDied;
+    private void OnDestroy() {
+        // Obje silinirken aboneliði kesinlikle iptal et!
+        if (LevelManager.Instance != null) {
+            LevelManager.Instance.OnDifficultyChanged -= LevelManager_OnDifficultyChanged;
+        }
+    }
 
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    public event Action<float> OnSkillProgressChanged;
+
     public static UIManager Instance { get; private set; }
 
     [SerializeField] private TextMeshProUGUI scoreText;
@@ -16,12 +18,18 @@ public class UIManager : MonoBehaviour
     }
 
     private void Start() {
-        LevelManager.Instance.OnScoreChanged += Instance_OnScoreChanged;
+        LevelManager.Instance.OnScoreChanged += LevelManager_OnScoreChanged;
+        Player.Instance.GetMelee().OnParried += ChangeSkillProgress;
+        Player.Instance.OnSkillUsed += ChangeSkillProgress;
 
         UpdateScore(0);
     }
 
-    private void Instance_OnScoreChanged(int newScore) {
+    private void ChangeSkillProgress(object sender, EventArgs e) {
+        OnSkillProgressChanged?.Invoke(Player.Instance.CurrentSkillPoint / (float) Player.Instance.MaxSkillPoint);
+    }
+
+    private void LevelManager_OnScoreChanged(int newScore) {
         UpdateScore(newScore);
     }
 
@@ -30,9 +38,9 @@ public class UIManager : MonoBehaviour
     }
 
 
-
-
     private void OnDestroy() {
-        LevelManager.Instance.OnScoreChanged -= Instance_OnScoreChanged;
+        LevelManager.Instance.OnScoreChanged -= LevelManager_OnScoreChanged;
+        Player.Instance.GetMelee().OnParried -= ChangeSkillProgress;
+        Player.Instance.OnSkillUsed -= ChangeSkillProgress;
     }
 }

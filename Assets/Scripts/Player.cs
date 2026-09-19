@@ -5,8 +5,13 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public event EventHandler OnAttack;
+    public event EventHandler OnSkillUsed;
 
     public static Player Instance { get; private set; }
+    public int CurrentSkillPoint { get; set; } = 0;
+    public int MaxSkillPoint { get; private set; } = 20;
+
+    [SerializeField] private Melee melee;
 
     private Rigidbody rb;
     private float moveSpeed = 5f;
@@ -46,6 +51,11 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash) {
             StartCoroutine(Dash());
         }
+        if (Input.GetMouseButtonDown(1) && CurrentSkillPoint == MaxSkillPoint) {
+            CurrentSkillPoint = 0;
+            OnSkillUsed?.Invoke(this, EventArgs.Empty);
+            //özel skill
+        }
 
     }
 
@@ -57,6 +67,14 @@ public class Player : MonoBehaviour
         HandleMovement();
         LookAtMouse();
         //CalculateRotationSpeed();
+    }
+
+    public void AddSkillPoint(int amount) {
+        CurrentSkillPoint += amount;
+
+        if(CurrentSkillPoint > MaxSkillPoint) {
+            CurrentSkillPoint = MaxSkillPoint;
+        }
     }
 
     private void LookAtMouse() {
@@ -145,8 +163,9 @@ public class Player : MonoBehaviour
         return inputVector;
     }
 
-
-
+    public Melee GetMelee() {
+        return melee;
+    }
 
 
     //private void CalculateRotationSpeed() {
