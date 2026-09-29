@@ -6,8 +6,9 @@ using UnityEngine.SceneManagement;
 public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
 
     public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
+    public event Action OnDied; 
 
-    public float Health { get; set; } = 400f;
+    public float Health { get; set; } = 400f; //400f
     private float currentHealth;
 
     private DamageFlash damageFlash;
@@ -40,10 +41,11 @@ public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
     private IEnumerator DelayDie(float duration) {
         yield return new WaitForSeconds(duration);
         Die();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); //ileride levelmanager ile hallederiz þimdilik kalsýn
     }
 
     private void Die() {
-        Destroy(gameObject);
+        //Destroy(gameObject);
+        OnDied?.Invoke();
+        gameObject.SetActive(false);
     }
 }

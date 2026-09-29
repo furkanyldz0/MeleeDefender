@@ -9,6 +9,13 @@ public class ProjectileWaveSkill : MonoBehaviour {
     [SerializeField] private ProjectileWave projectileWavePrefab;
     [SerializeField] private Transform projectileSpawnPoint;
 
+    [SerializeField] private ParticleSystem skillActiveEffect;
+    [SerializeField] private ParticleSystem skillEndEffect;
+
+    // Yaratýlan efektleri hafýzada tutacaðýmýz referanslar
+    private ParticleSystem spawnedActiveEffect;
+    private ParticleSystem spawnedEndEffect;
+
     private float waveSpeed = 30f;
     private float waveDamage = 100f;
     private float waveLifeTime = 5;
@@ -34,6 +41,8 @@ public class ProjectileWaveSkill : MonoBehaviour {
     private IEnumerator ActivateSkill(float duration) {
         IsActive = true;
 
+        PlayActiveEffect();
+
         float elapsed = 0f;
         while (elapsed < duration) {
             elapsed += Time.deltaTime;
@@ -45,6 +54,9 @@ public class ProjectileWaveSkill : MonoBehaviour {
         IsActive = false;
         OnSkillProgressChanged?.Invoke(0f);
         windowCoroutine = null;
+
+        StopActiveEffect();
+        PlayEndEffect();
     }
 
     private void Player_OnAttack(object sender, EventArgs e) {
@@ -67,6 +79,37 @@ public class ProjectileWaveSkill : MonoBehaviour {
     private void SendProjectileWave() {
         var wave = Instantiate(projectileWavePrefab, projectileSpawnPoint.position, Quaternion.LookRotation(projectileSpawnPoint.forward));
         wave.Setup(projectileSpawnPoint.forward, waveSpeed, waveDamage, waveLifeTime);
+    }
+
+    private void PlayActiveEffect() {
+        if (skillActiveEffect == null) return;
+
+        if (spawnedActiveEffect == null) {
+            spawnedActiveEffect = Instantiate(skillActiveEffect, Player.Instance.transform);
+            spawnedActiveEffect.transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            spawnedActiveEffect.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+        }
+
+        spawnedActiveEffect.Play();
+    }
+
+    private void StopActiveEffect() {
+        if (spawnedActiveEffect != null) {
+            // StopEmitting: Yeni partikül üretimini durdurur, eskiler yavaþça kaybolur
+            spawnedActiveEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+    }
+
+    private void PlayEndEffect() {
+        if (skillEndEffect == null) return;
+
+        if (spawnedEndEffect == null) {
+            spawnedEndEffect = Instantiate(skillEndEffect, Player.Instance.transform);
+            spawnedEndEffect.transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            spawnedEndEffect.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+        }
+
+        spawnedEndEffect.Play();
     }
 
     private void OnDestroy() {

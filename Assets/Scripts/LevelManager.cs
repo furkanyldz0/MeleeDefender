@@ -11,9 +11,9 @@ public class LevelManager : MonoBehaviour
     public DifficultyTier CurrentDifficultyTier { get; private set; }
 
     [SerializeField] private DifficultyConfigSO difficultyConfigSO;
-    
-    private int currentTierIndex = 0;
+    [SerializeField] private Base baseObject;
 
+    private int currentTierIndex = 0;
     private int score = 0;
 
     private void Awake() {
@@ -26,6 +26,12 @@ public class LevelManager : MonoBehaviour
     private void Start() {
         CurrentDifficultyTier = difficultyConfigSO.tiers[currentTierIndex];
         ApplyDifficulty(CurrentDifficultyTier);
+
+        baseObject.OnDied += BaseObject_OnDied; 
+    }
+
+    private void BaseObject_OnDied() {
+        Player.Instance.gameObject.SetActive(false);
     }
 
     private void Enemy_OnAnyEnemyDied(Enemy enemy) {
@@ -49,6 +55,10 @@ public class LevelManager : MonoBehaviour
 
     private void ApplyDifficulty(DifficultyTier difficultyTier) {
         OnDifficultyChanged?.Invoke(difficultyTier);
+    }
+
+    private void OnDestroy() {
+        baseObject.OnDied -= BaseObject_OnDied;
     }
 
     private void OnEnable() => Enemy.OnAnyEnemyDied += Enemy_OnAnyEnemyDied;

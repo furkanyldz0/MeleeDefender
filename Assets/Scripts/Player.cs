@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public int MaxSkillPoint { get; private set; } = 20;
 
     [SerializeField] private Melee melee;
+    [SerializeField] private TrailRenderer trail;
 
     private Rigidbody rb;
     private float moveSpeed = 5f;
@@ -35,6 +36,8 @@ public class Player : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Confined; //bunu sonra bi config dosyasýnýn içine al yeri burasý deðil
         rb = GetComponent<Rigidbody>();
+
+        DisableTrail();
     }
 
     private void Update() {
@@ -105,15 +108,23 @@ public class Player : MonoBehaviour
     private IEnumerator Dash() {
         Vector2 inputVector = GetMovementVector2Normalized();
         Vector3 dashDir = new Vector3(inputVector.x, 0, inputVector.y);
+        if (dashDir == Vector3.zero) {
+            yield break;
+        }
+            
 
         canDash = false;
         isDashing = true;
         //rb.useGravity = false; //
+        EnableTrail();
         rb.linearVelocity = dashDir * dashingPower;
         yield return new WaitForSeconds(dashingTime);
+
         isDashing = false;
+        DisableTrail();
         rb.linearVelocity = Vector3.zero;
         yield return new WaitForSeconds(dashingCooldown);
+
         canDash = true;
         //rb.useGravity = true;
     }
@@ -145,6 +156,14 @@ public class Player : MonoBehaviour
 
         // Hiçbir tuþa basýlmýyorsa sýfýrla
         if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D)) currentXDirection = 0;
+    }
+
+    private void EnableTrail() {
+        trail.emitting = true;
+    }
+
+    private void DisableTrail() {
+        trail.emitting = false;
     }
 
     private Vector2 GetMovementVector2Normalized() {
