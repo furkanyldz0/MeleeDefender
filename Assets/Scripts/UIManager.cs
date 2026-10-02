@@ -30,12 +30,12 @@ public class UIManager : MonoBehaviour
     private void Start() {
         LevelManager.Instance.OnScoreChanged += LevelManager_OnScoreChanged;
         Player.Instance.GetMelee().OnParried += ChangeSkillProgress;
-        Player.Instance.OnSkillUsed += ChangeSkillProgress;
+        //Player.Instance.OnSkillUsed += ChangeSkillProgress;
         baseObject.OnDied += BaseObject_OnDied;
 
         bestScore = PlayerPrefs.GetInt("BestScore", 0);
         UpdateScore(0);
-        HideGameOverPanel();
+        //HideGameOverPanel();
     }
 
     private void BaseObject_OnDied() {
@@ -98,7 +98,7 @@ public class UIManager : MonoBehaviour
     private void OnDestroy() {
         LevelManager.Instance.OnScoreChanged -= LevelManager_OnScoreChanged;
         Player.Instance.GetMelee().OnParried -= ChangeSkillProgress;
-        Player.Instance.OnSkillUsed -= ChangeSkillProgress;
+        //Player.Instance.OnSkillUsed -= ChangeSkillProgress;
         baseObject.OnDied -= BaseObject_OnDied;
     }
 }

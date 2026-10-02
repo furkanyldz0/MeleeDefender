@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 {
@@ -11,6 +12,7 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 
     public float Health { get; set; } = 100f;
     public bool IsSpawning { get; set; } = false;
+    public float FirstAttackTime { get; set; } = 1f;
 
     private float maxHealth;
     private float attackTime = 2.5f;
@@ -32,13 +34,22 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 
     private void Update()
     {
-        if(attackTimeDelta > 0 && !IsSpawning) {
+        if (IsSpawning)
+            return;
+
+        if(attackTimeDelta > 0) {
             attackTimeDelta -= Time.deltaTime;
         }
         else if(attackTimeDelta <= 0) {
             weapon.Shoot();
             attackTimeDelta = attackTime;
         }
+    }
+
+    public void Setup(bool isSpawning, float firstAttackTime) {
+        IsSpawning = isSpawning;
+        FirstAttackTime = firstAttackTime;
+        attackTimeDelta = FirstAttackTime;
     }
 
     public void Damage(float DamageAmount) {

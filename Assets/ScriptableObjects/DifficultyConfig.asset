@@ -15,28 +15,46 @@ MonoBehaviour:
   tiers:
   - requiredScore: 0
     enemySpawnCount: 2
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 0.1
     bulletSpeed: 5
   - requiredScore: 5
     enemySpawnCount: 3
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 0.2
     bulletSpeed: 5
   - requiredScore: 10
     enemySpawnCount: 3
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 0.5
     bulletSpeed: 8
   - requiredScore: 15
     enemySpawnCount: 4
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 0.5
     bulletSpeed: 8
   - requiredScore: 20
     enemySpawnCount: 4
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 1.5
     bulletSpeed: 12
   - requiredScore: 30
     enemySpawnCount: 5
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
     bulletSpeed: 12
   - requiredScore: 50
     enemySpawnCount: 6
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
     bulletSpeed: 12
   - requiredScore: 70
     enemySpawnCount: 7
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
     bulletSpeed: 12
   - requiredScore: 90
     enemySpawnCount: 8
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
     bulletSpeed: 12

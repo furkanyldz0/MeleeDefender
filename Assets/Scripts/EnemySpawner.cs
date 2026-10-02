@@ -11,7 +11,10 @@ public class EnemySpawnter : MonoBehaviour
     [SerializeField] private Vector2 horizontalPositionRange = new Vector2(-4f, 4f);
 
     [SerializeField] private int enemySpawnCount = 1000;
-    [SerializeField] private int maxCurrentEnemyCount = 2;
+
+    private int maxCurrentEnemyCount = 2;
+    private float enemySpawnTimeOffset = 0.5f;
+    private float enemyFirstAttackTime = 1f;
 
     private Vector3[] enemyPositions;
     private Dictionary<Enemy, int> occupiedEnemyPositions = new Dictionary<Enemy, int>();
@@ -23,11 +26,17 @@ public class EnemySpawnter : MonoBehaviour
         CalculateEnemySpace();
 
         LevelManager.Instance.OnDifficultyChanged += LevelManager_OnDifficultyChanged;
+        if (LevelManager.Instance.CurrentDifficultyTier != null) {
+            LevelManager_OnDifficultyChanged(LevelManager.Instance.CurrentDifficultyTier);
+        }
+
         CheckPositions();
     }
 
     private void LevelManager_OnDifficultyChanged(DifficultyTier difficultyTier) {
         maxCurrentEnemyCount = difficultyTier.enemySpawnCount;
+        enemySpawnTimeOffset = difficultyTier.enemySpawnTimeOffset;
+        enemyFirstAttackTime = difficultyTier.enemyFirstAttackTime;
     }
 
     private void CalculateEnemySpace() {
@@ -85,10 +94,10 @@ public class EnemySpawnter : MonoBehaviour
         enemy.IsSpawning = true;
 
         enemy.transform.DOMove(enemyPositions[positionIndex], 1f)
-            .SetDelay(Random.Range(1f, 4f))
+            .SetDelay(Random.Range(.5f + enemySpawnTimeOffset, 1.5f + enemySpawnTimeOffset * 3)) //1-4
             .SetLink(enemy.gameObject)
             .OnComplete(() => {
-                enemy.IsSpawning = false;
+                enemy.Setup(false, enemyFirstAttackTime);
             });
 
         occupiedEnemyPositions[enemy] = positionIndex;
