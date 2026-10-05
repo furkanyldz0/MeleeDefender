@@ -137,9 +137,10 @@ public class Melee : MonoBehaviour {
     }
 
     private void ParryBullet(Bullet bullet) { //düþman parrylerse deðiþiriz, þuan sadece player
-        float defaultDamageMultiplier = 1.5f;
-        float speedDamageMultiplier = bullet.ProjectileSpeed * 0.1f;
-        float finalDamageMultiplier = defaultDamageMultiplier + speedDamageMultiplier;
+        //float defaultDamageMultiplier = 1.5f;
+        float speedDamageMultiplier = bullet.ProjectileSpeed * 0.35f;
+        //float finalDamageMultiplier = defaultDamageMultiplier + speedDamageMultiplier;
+        float finalDamageMultiplier = speedDamageMultiplier;
 
         float parriedBulletSpeed = bullet.ProjectileSpeed * 5f;
 

@@ -14,47 +14,110 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyConfigSO
   tiers:
   - requiredScore: 0
-    enemySpawnCount: 2
+    totalEnemyCount: 2
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 0.1
     bulletSpeed: 5
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 0
   - requiredScore: 5
-    enemySpawnCount: 3
+    totalEnemyCount: 3
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 0.2
     bulletSpeed: 5
+    specialEnemies: []
   - requiredScore: 10
-    enemySpawnCount: 3
+    totalEnemyCount: 3
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 0.5
     bulletSpeed: 8
+    specialEnemies: []
   - requiredScore: 15
-    enemySpawnCount: 4
+    totalEnemyCount: 4
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 0.5
     bulletSpeed: 8
+    specialEnemies: []
   - requiredScore: 20
-    enemySpawnCount: 4
+    totalEnemyCount: 4
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 1.5
-    bulletSpeed: 12
+    bulletSpeed: 8
+    specialEnemies: []
   - requiredScore: 30
-    enemySpawnCount: 5
+    totalEnemyCount: 5
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
-    bulletSpeed: 12
+    bulletSpeed: 8
+    specialEnemies: []
+  - requiredScore: 40
+    totalEnemyCount: 6
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 8
+    specialEnemies: []
   - requiredScore: 50
-    enemySpawnCount: 6
+    totalEnemyCount: 3
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
-    bulletSpeed: 12
+    bulletSpeed: 8
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 1
+  - requiredScore: 60
+    totalEnemyCount: 3
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 8
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 2
   - requiredScore: 70
-    enemySpawnCount: 7
+    totalEnemyCount: 3
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
-    bulletSpeed: 12
+    bulletSpeed: 8
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 3
   - requiredScore: 90
-    enemySpawnCount: 8
+    totalEnemyCount: 4
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
-    bulletSpeed: 12
+    bulletSpeed: 8
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 4
+  - requiredScore: 110
+    totalEnemyCount: 4
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 4
+  - requiredScore: 130
+    totalEnemyCount: 5
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 5
+  - requiredScore: 150
+    totalEnemyCount: 6
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 6
+  - requiredScore: 170
+    totalEnemyCount: 7
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 7

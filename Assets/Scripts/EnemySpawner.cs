@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySpawnter : MonoBehaviour
 {
-    [SerializeField] private Enemy enemyPrefab;
+    [SerializeField] private EnemyTypeSO normalEnemyType;
 
     [SerializeField] private float horizontalSpace = 1.1f;
     [SerializeField] private float verticalPosition = 7f;
@@ -21,6 +21,8 @@ public class EnemySpawnter : MonoBehaviour
 
     private int currentEnemyCount;
 
+    private List<EnemyQuota> currentQuotas = new List<EnemyQuota>();
+
 
     private void Start() {
         CalculateEnemySpace();
@@ -34,9 +36,35 @@ public class EnemySpawnter : MonoBehaviour
     }
 
     private void LevelManager_OnDifficultyChanged(DifficultyTier difficultyTier) {
-        maxCurrentEnemyCount = difficultyTier.enemySpawnCount;
+        maxCurrentEnemyCount = difficultyTier.totalEnemyCount;
         enemySpawnTimeOffset = difficultyTier.enemySpawnTimeOffset;
         enemyFirstAttackTime = difficultyTier.enemyFirstAttackTime;
+        currentQuotas = difficultyTier.specialEnemies;
+
+        int totalQuota = 0;
+        foreach (var q in difficultyTier.specialEnemies) totalQuota += q.count;
+        if (totalQuota > difficultyTier.totalEnemyCount)
+            Debug.LogWarning($"Tier {difficultyTier.requiredScore}: özel düþman kotalarý toplam sayýyý aþýyor!");
+
+        CheckPositions();
+    }
+
+    //private void Enemy_OnAnyEnemyDied(Enemy enemy) {
+    //    if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
+    //        occupiedEnemyPositions.Remove(enemy);
+    //        currentEnemyCount--;
+    //        CheckPositions();
+    //    }
+    //}
+
+    private void Enemy_OnAnyEnemyDied(object sender, Enemy.OnAnyEnemyDiedEventArgs e) {
+        if(sender is Enemy enemy) {
+            if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
+                occupiedEnemyPositions.Remove(enemy);
+                currentEnemyCount--;
+                CheckPositions();
+            }
+        }
     }
 
     private void CalculateEnemySpace() {
@@ -50,6 +78,7 @@ public class EnemySpawnter : MonoBehaviour
             enemyPositions[i] = new Vector3(tempX + i * horizontalSpace, 0f, verticalPosition);
         }
     }
+
 
     private void CheckPositions() {
         if (currentEnemyCount >= maxCurrentEnemyCount || enemySpawnCount <= 0)
@@ -90,7 +119,9 @@ public class EnemySpawnter : MonoBehaviour
     }
 
     private void SpawnEnemy(int positionIndex) {
-        var enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+        EnemyTypeSO type = PickTypeToSpawn();
+        var enemy = Instantiate(type.prefab, transform.position, Quaternion.identity);
+        enemy.TypeData = type;
         enemy.IsSpawning = true;
 
         enemy.transform.DOMove(enemyPositions[positionIndex], 1f)
@@ -103,14 +134,30 @@ public class EnemySpawnter : MonoBehaviour
         occupiedEnemyPositions[enemy] = positionIndex;
     }
 
-    private void Enemy_OnAnyEnemyDied(Enemy enemy) {
-        if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
-            occupiedEnemyPositions.Remove(enemy);
-            currentEnemyCount--;
-            CheckPositions();
+    private EnemyTypeSO PickTypeToSpawn() {
+        EnemyTypeSO best = null;
+        int bestDeficit = 0;
+
+        foreach (var quota in currentQuotas) {
+            int deficit = quota.count - CountAlive(quota.type);
+            if (deficit > bestDeficit) {
+                bestDeficit = deficit;
+                best = quota.type;
+            }
         }
+
+        return best != null ? best : normalEnemyType;
     }
 
+    private int CountAlive(EnemyTypeSO type) {
+        int count = 0;
+        foreach (var enemy in occupiedEnemyPositions.Keys) {
+            if (enemy.TypeData == type) count++;
+        }
+        return count;
+    }
+
+    
 
 
 

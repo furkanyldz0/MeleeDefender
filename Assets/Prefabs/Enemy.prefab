@@ -188,6 +188,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   weapon: {fileID: 937632372575852334}
+  defaultAttackCount: 1
+  attackInterval: 0
 --- !u!114 &6427564455364694615
 MonoBehaviour:
   m_ObjectHideFlags: 0

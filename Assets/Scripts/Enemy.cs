@@ -5,11 +5,19 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 {
-    public static event Action<Enemy> OnAnyEnemyDied;
+    public static event EventHandler<OnAnyEnemyDiedEventArgs> OnAnyEnemyDied;
     public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
+    public class OnAnyEnemyDiedEventArgs : EventArgs {
+        public int scoreToKill;
+    }
 
     [SerializeField] private Weapon weapon;
+    [SerializeField] private float bulletSpeedMultiplier = 1f;
+    [SerializeField] private int defaultAttackCount = 1;
+    [SerializeField] private float attackInterval = 0f;
+    [SerializeField] private int scoreToKill = 1;
 
+    public EnemyTypeSO TypeData { get; set; }
     public float Health { get; set; } = 100f;
     public bool IsSpawning { get; set; } = false;
     public float FirstAttackTime { get; set; } = 1f;
@@ -17,6 +25,8 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
     private float maxHealth;
     private float attackTime = 2.5f;
     private float attackTimeDelta;
+    private float attackIntervalDelta;
+    private int attackCount; 
 
     private DamageFlash damageFlash;
 
@@ -26,6 +36,8 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 
         maxHealth = Health;
         attackTimeDelta = attackTime;
+        attackIntervalDelta = attackInterval;
+        attackCount = defaultAttackCount;
 
         OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
             currentHealthNormalized = Health / maxHealth
@@ -41,8 +53,23 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
             attackTimeDelta -= Time.deltaTime;
         }
         else if(attackTimeDelta <= 0) {
-            weapon.Shoot();
-            attackTimeDelta = attackTime;
+
+            if (attackCount > 0) {
+                if (attackIntervalDelta > 0) {
+                    attackIntervalDelta -= Time.deltaTime;
+                }
+                else if (attackIntervalDelta <= 0) {
+                    weapon.Shoot(bulletSpeedMultiplier);
+                    attackIntervalDelta = attackInterval;
+                    attackCount--;
+                }
+            }
+            else if (attackCount == 0) {
+                attackIntervalDelta = attackInterval;
+                attackTimeDelta = attackTime;
+                attackCount = defaultAttackCount;
+            }
+            
         }
     }
 
@@ -72,7 +99,9 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 
     private void Die() {
         Destroy(gameObject);
-        OnAnyEnemyDied?.Invoke(this);
+        OnAnyEnemyDied?.Invoke(this, new OnAnyEnemyDiedEventArgs {
+            scoreToKill = scoreToKill
+        });
     }
 
 }

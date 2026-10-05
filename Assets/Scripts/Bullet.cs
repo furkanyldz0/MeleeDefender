@@ -9,7 +9,7 @@ public class Bullet : MonoBehaviour {
     [SerializeField] private GameObject defaultVisual;
     [SerializeField] private GameObject reflectedVisual;
 
-    public float ProjectileSpeed { get; set; } = 3f;
+    public float ProjectileSpeed { get; set; }
     public float LifeTime { get; set; } = 20f;
     public float ProjectileDamage { get; set; } = 34f;
     public Vector3 Direction { get; set; }
@@ -19,8 +19,6 @@ public class Bullet : MonoBehaviour {
     {
         Destroy(gameObject, LifeTime);
         Direction = transform.forward;
-
-        ProjectileSpeed = LevelManager.Instance.CurrentDifficultyTier.bulletSpeed; //bunu weapon'dan vs. ayarlayabilirim ileride
     }
 
     private void Update() {
@@ -60,6 +58,10 @@ public class Bullet : MonoBehaviour {
 
         defaultVisual.SetActive(false);
         reflectedVisual.SetActive(true);
+    }
+
+    public void Setup(float speedMultiplier) {
+        ProjectileSpeed = speedMultiplier * LevelManager.Instance.CurrentDifficultyTier.bulletSpeed;
     }
 
 }

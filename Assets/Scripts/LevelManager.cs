@@ -34,8 +34,8 @@ public class LevelManager : MonoBehaviour
         Player.Instance.gameObject.SetActive(false);
     }
 
-    private void Enemy_OnAnyEnemyDied(Enemy enemy) {
-        AddScore(1);
+    private void Enemy_OnAnyEnemyDied(object sender, Enemy.OnAnyEnemyDiedEventArgs e) {
+        AddScore(e.scoreToKill);
     }
 
     private void AddScore(int amount) {
