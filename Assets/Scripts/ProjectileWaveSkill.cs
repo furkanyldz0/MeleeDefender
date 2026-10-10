@@ -12,7 +12,7 @@ public class ProjectileWaveSkill : MonoBehaviour {
     [SerializeField] private ParticleSystem skillActiveEffect;
     [SerializeField] private ParticleSystem skillEndEffect;
 
-    // Yaratýlan efektleri hafýzada tutacaðýmýz referanslar
+    // YaratÄ±lan efektleri hafÄ±zada tutacaÄŸÄ±mÄ±z referanslar
     private ParticleSystem spawnedActiveEffect;
     private ParticleSystem spawnedEndEffect;
 
@@ -78,7 +78,8 @@ public class ProjectileWaveSkill : MonoBehaviour {
 
     private void SendProjectileWave() {
         var wave = Instantiate(projectileWavePrefab, projectileSpawnPoint.position, Quaternion.LookRotation(projectileSpawnPoint.forward));
-        wave.Setup(projectileSpawnPoint.forward, waveSpeed, waveDamage, waveLifeTime);
+        float damage = waveDamage * PlayerStats.Instance.DamageMultiplier;
+        wave.Setup(projectileSpawnPoint.forward, waveSpeed, damage, waveLifeTime);
     }
 
     private void PlayActiveEffect() {
@@ -95,7 +96,7 @@ public class ProjectileWaveSkill : MonoBehaviour {
 
     private void StopActiveEffect() {
         if (spawnedActiveEffect != null) {
-            // StopEmitting: Yeni partikül üretimini durdurur, eskiler yavaþça kaybolur
+            // StopEmitting: Yeni partikÃ¼l Ã¼retimini durdurur, eskiler yavaÅŸÃ§a kaybolur
             spawnedActiveEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
     }
