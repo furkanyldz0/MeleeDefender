@@ -1,16 +1,25 @@
 using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawnter : MonoBehaviour
+public class EnemySpawner : MonoBehaviour
 {
+    public event Action OnWaveCleared;
+
     [SerializeField] private EnemyTypeSO normalEnemyType;
 
     [SerializeField] private float horizontalSpace = 1.1f;
     [SerializeField] private float verticalPosition = 7f;
     [SerializeField] private Vector2 horizontalPositionRange = new Vector2(-4f, 4f);
 
-    [SerializeField] private int enemySpawnCount = 1000;
+    public EnemyTypeSO NormalEnemyType => normalEnemyType;
+    public float EnemyHealthMultiplier { get; set; } = 1f;
+    public float ShieldChance { get; set; } // 0-1, WaveManager dalgaya gÃ¶re ayarlar
+    public int RemainingInWave => enemySpawnCount + currentEnemyCount;
+
+    // Bu dalgada daha doÄŸacak dÃ¼ÅŸman sayÄ±sÄ± (WaveManager belirler)
+    private int enemySpawnCount;
 
     private int maxCurrentEnemyCount = 2;
     private float enemySpawnTimeOffset = 0.5f;
@@ -20,19 +29,58 @@ public class EnemySpawnter : MonoBehaviour
     private Dictionary<Enemy, int> occupiedEnemyPositions = new Dictionary<Enemy, int>();
 
     private int currentEnemyCount;
+    private bool isWaveRunning;
 
     private List<EnemyQuota> currentQuotas = new List<EnemyQuota>();
 
 
-    private void Start() {
+    private void Awake() {
         CalculateEnemySpace();
+    }
 
+    private void Start() {
         LevelManager.Instance.OnDifficultyChanged += LevelManager_OnDifficultyChanged;
         if (LevelManager.Instance.CurrentDifficultyTier != null) {
             LevelManager_OnDifficultyChanged(LevelManager.Instance.CurrentDifficultyTier);
         }
+    }
 
+    public void StartWave(int enemyCount) {
+        enemySpawnCount = enemyCount;
+        isWaveRunning = true;
         CheckPositions();
+    }
+
+    public void StopSpawning() {
+        enemySpawnCount = 0;
+        isWaveRunning = false;
+    }
+
+    // Boss gibi dalga kotasÄ± dÄ±ÅŸÄ±ndaki Ã§aÄŸrÄ±lar iÃ§in (kotaya sayÄ±lmaz)
+    public int SpawnExtra(int count, int maxAlive) {
+        List<int> availableIndexes = GetAvailableIndexes();
+        int spawned = 0;
+
+        while (spawned < count && currentEnemyCount < maxAlive && availableIndexes.Count > 0) {
+            int randomIndex = UnityEngine.Random.Range(0, availableIndexes.Count);
+            SpawnEnemy(availableIndexes[randomIndex], normalEnemyType);
+            availableIndexes.RemoveAt(randomIndex);
+
+            currentEnemyCount++;
+            spawned++;
+        }
+
+        return spawned;
+    }
+
+    public void KillAllEnemies() {
+        // SÃ¶zlÃ¼k Ã¶lÃ¼m olaylarÄ±nda deÄŸiÅŸeceÄŸi iÃ§in kopyasÄ±nÄ± dolaÅŸ
+        List<Enemy> alive = new List<Enemy>(occupiedEnemyPositions.Keys);
+        foreach (Enemy enemy in alive) {
+            if (enemy != null) {
+                enemy.Kill();
+            }
+        }
     }
 
     private void LevelManager_OnDifficultyChanged(DifficultyTier difficultyTier) {
@@ -44,18 +92,10 @@ public class EnemySpawnter : MonoBehaviour
         int totalQuota = 0;
         foreach (var q in difficultyTier.specialEnemies) totalQuota += q.count;
         if (totalQuota > difficultyTier.totalEnemyCount)
-            Debug.LogWarning($"Tier {difficultyTier.requiredScore}: özel düþman kotalarý toplam sayýyý aþýyor!");
+            Debug.LogWarning($"Tier {difficultyTier.requiredScore}: Ã–zel dÃ¼ÅŸman kotalarÄ± toplam sayÄ±yÄ± aÅŸÄ±yor!");
 
         CheckPositions();
     }
-
-    //private void Enemy_OnAnyEnemyDied(Enemy enemy) {
-    //    if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
-    //        occupiedEnemyPositions.Remove(enemy);
-    //        currentEnemyCount--;
-    //        CheckPositions();
-    //    }
-    //}
 
     private void Enemy_OnAnyEnemyDied(object sender, Enemy.OnAnyEnemyDiedEventArgs e) {
         if(sender is Enemy enemy) {
@@ -63,14 +103,18 @@ public class EnemySpawnter : MonoBehaviour
                 occupiedEnemyPositions.Remove(enemy);
                 currentEnemyCount--;
                 CheckPositions();
+
+                if (isWaveRunning && enemySpawnCount <= 0 && currentEnemyCount <= 0) {
+                    isWaveRunning = false;
+                    OnWaveCleared?.Invoke();
+                }
             }
         }
     }
 
     private void CalculateEnemySpace() {
-        //düþmanlar yatay uç deðerlerde de olabileceði için +1 eklemeden eksik kalýyor
+        //dÃ¼ÅŸmanlar yatay uÃ§ deÄŸerlerde de olabileceÄŸi iÃ§in +1 eklemeden eksik kalÄ±yor
         int totalEnemyCount = (int)((horizontalPositionRange.y - horizontalPositionRange.x) / horizontalSpace) + 1;
-        Debug.Log(totalEnemyCount);
 
         enemyPositions = new Vector3[totalEnemyCount];
         float tempX = horizontalPositionRange.x;
@@ -79,53 +123,59 @@ public class EnemySpawnter : MonoBehaviour
         }
     }
 
-
-    private void CheckPositions() {
-        if (currentEnemyCount >= maxCurrentEnemyCount || enemySpawnCount <= 0)
-            return;
-
+    private List<int> GetAvailableIndexes() {
         List<int> availableIndexes = new List<int>();
 
-        // 1. Önce SADECE haritadaki tüm boþ yerleri bul (Sayaçlarý burada ellemiyoruz)
         for (int i = 0; i < enemyPositions.Length; i++) {
             if (!occupiedEnemyPositions.ContainsValue(i)) {
                 availableIndexes.Add(i);
             }
         }
 
-        // 2. Kaç tane spawn yapabiliriz onu bul
-        int enemyToSpawn = 0;
+        return availableIndexes;
+    }
+
+    private void CheckPositions() {
+        if (!isWaveRunning || currentEnemyCount >= maxCurrentEnemyCount || enemySpawnCount <= 0)
+            return;
+
+        // 1. Ã–nce SADECE haritadaki tÃ¼m boÅŸ yerleri bul (SayaÃ§larÄ± burada ellemiyoruz)
+        List<int> availableIndexes = GetAvailableIndexes();
+
+        // 2. KaÃ§ tane spawn yapabiliriz onu bul
         while (enemySpawnCount > 0 && currentEnemyCount < maxCurrentEnemyCount && availableIndexes.Count > 0) {
 
-            // 3. Boþ yerler listesinden rastgele bir sýra (index) seç
-            int randomIndex = Random.Range(0, availableIndexes.Count);
+            // 3. BoÅŸ yerler listesinden rastgele bir sÄ±ra (index) seÃ§
+            int randomIndex = UnityEngine.Random.Range(0, availableIndexes.Count);
 
-            // O sýradaki asýl pozisyon numarasýný al (Örn: 5. pozisyon)
+            // O sÄ±radaki asÄ±l pozisyon numarasÄ±nÄ± al (Ã¶rn: 5. pozisyon)
             int selectedPositionIndex = availableIndexes[randomIndex];
 
-            // Düþmaný o pozisyonda yarat
-            SpawnEnemy(selectedPositionIndex);
+            // DÃ¼ÅŸmanÄ± o pozisyonda yarat
+            SpawnEnemy(selectedPositionIndex, PickTypeToSpawn());
 
-            // *** KRÝTÝK NOKTA *** 
-            // Seçilen yeri müsaitler listesinden çýkar ki ayný yere iki düþman inmesin.
-            // Bu iþlem senin ana enemyPositions dizini ASLA bozmaz, sadece geçici listeden siler.
+            // SeÃ§ilen yeri mÃ¼saitler listesinden Ã§Ä±kar ki aynÄ± yere iki dÃ¼ÅŸman inmesin.
             availableIndexes.RemoveAt(randomIndex);
 
-            // 4. Sayaçlarý þimdi güncelle
-            enemyToSpawn++;
+            // 4. SayaÃ§larÄ± ÅŸimdi gÃ¼ncelle
             enemySpawnCount--;
             currentEnemyCount++;
         }
     }
 
-    private void SpawnEnemy(int positionIndex) {
-        EnemyTypeSO type = PickTypeToSpawn();
+    private void SpawnEnemy(int positionIndex, EnemyTypeSO type) {
         var enemy = Instantiate(type.prefab, transform.position, Quaternion.identity);
         enemy.TypeData = type;
         enemy.IsSpawning = true;
+        enemy.Health *= EnemyHealthMultiplier;
+        enemy.gameObject.AddComponent<EnemyVisual>();
+        if (UnityEngine.Random.value < ShieldChance) {
+            enemy.gameObject.AddComponent<EnemyShield>();
+        }
 
         enemy.transform.DOMove(enemyPositions[positionIndex], 1f)
-            .SetDelay(Random.Range(.5f + enemySpawnTimeOffset, 1.5f + enemySpawnTimeOffset * 3)) //1-4
+            .SetDelay(UnityEngine.Random.Range(.5f + enemySpawnTimeOffset, 1.5f + enemySpawnTimeOffset * 3)) //1-4
+            .SetEase(Ease.OutCubic)
             .SetLink(enemy.gameObject)
             .OnComplete(() => {
                 enemy.Setup(false, enemyFirstAttackTime);
@@ -157,14 +207,10 @@ public class EnemySpawnter : MonoBehaviour
         return count;
     }
 
-    
-
-
-
     private void OnEnable() => Enemy.OnAnyEnemyDied += Enemy_OnAnyEnemyDied;
     private void OnDisable() => Enemy.OnAnyEnemyDied -= Enemy_OnAnyEnemyDied;
     private void OnDestroy() {
-        // Obje silinirken aboneliði kesinlikle iptal et!
+        // Obje silinirken aboneliÄŸi kesinlikle iptal et!
         if (LevelManager.Instance != null) {
             LevelManager.Instance.OnDifficultyChanged -= LevelManager_OnDifficultyChanged;
         }

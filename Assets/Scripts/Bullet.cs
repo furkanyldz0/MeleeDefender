@@ -3,7 +3,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour {
 
     [SerializeField] private LayerMask bounceLayer;
-    [SerializeField] private LayerMask hitLayer; // Hasar alabilenlerin (Düþman/Oyuncu) katmaný
+    [SerializeField] private LayerMask hitLayer; // Hasar alabilenlerin (DÃ¼ÅŸman/Oyuncu) katmanÄ±
     [SerializeField] private float bulletThickness = 0.1f;
 
     [SerializeField] private GameObject defaultVisual;
@@ -14,54 +14,119 @@ public class Bullet : MonoBehaviour {
     public float ProjectileDamage { get; set; } = 34f;
     public Vector3 Direction { get; set; }
     public bool IsParried { get; set; }
+    public bool IsCrit { get; private set; }
+    public int PierceRemaining { get; set; }
+    // Bossun aÄŸÄ±r mermileri savuÅŸturulunca ekstra hasar verir
+    public float ParryDamageBonus { get; set; } = 1f;
 
     private void Start()
     {
         Destroy(gameObject, LifeTime);
-        Direction = transform.forward;
+
+        // Kopyalanan/Ã¶zel kurulan mermilerin yÃ¶nÃ¼nÃ¼ ezme
+        if (Direction == Vector3.zero) {
+            Direction = transform.forward;
+        }
     }
 
     private void Update() {
-        // 1. Bu karede ne kadar ileri gideceðimizi hesapla (Akýcýlýk için Time.deltaTime)
+        // 1. Bu karede ne kadar ileri gideceÄŸimizi hesapla (AkÄ±cÄ±lÄ±k iÃ§in Time.deltaTime)
         float moveDistance = ProjectileSpeed * Time.deltaTime;
 
-        // 2. Merminin gideceði yöne doðru kalýn bir ýþýn (Küre - SphereCast) yolla.
-        // bounceLayer (Duvarlar) ve hitLayer (Düþmanlar) maskelerini ayný anda kontrol ediyoruz.
+        // 2. Merminin gideceÄŸi yÃ¶ne doÄŸru kalÄ±n bir Ä±ÅŸÄ±n (KÃ¼re - SphereCast) yolla.
+        // bounceLayer (Duvarlar) ve hitLayer (DÃ¼ÅŸmanlar) maskelerini aynÄ± anda kontrol ediyoruz.
         if (Physics.SphereCast(transform.position, bulletThickness, Direction, out RaycastHit hit, moveDistance, bounceLayer | hitLayer)) {
-            // Çarptýðýmýz obje Duvar/Sekme katmanýnda mý?
+            // Ã‡arptÄ±ÄŸÄ±mÄ±z obje Duvar/Sekme katmanÄ±nda mÄ±?
             if ((bounceLayer.value & (1 << hit.collider.gameObject.layer)) > 0) {
                 // Mermiyi sektir
                 Direction = Vector3.Reflect(Direction, hit.normal).normalized;
                 transform.position = hit.point; // Duvara hizala
+                GameEvents.BulletBounced(hit.point);
             }
-            // Çarptýðýmýz obje sekme katmaný deðilse ve hasar alabiliyorsa
+            // Ã‡arptÄ±ÄŸÄ±mÄ±z obje sekme katmanÄ± deÄŸilse ve hasar alabiliyorsa
             else if (hit.collider.TryGetComponent<IDamagable>(out IDamagable damagable)) {
+                // Dost ateÅŸi yok: dÃ¼ÅŸman mermisi dÃ¼ÅŸmanlara, yansÄ±yan mermi kaleye zarar vermez
+                bool isBase = damagable is Base;
+                if (isBase == IsParried) {
+                    Move(moveDistance);
+                    return;
+                }
+
                 damagable.Damage(ProjectileDamage);
-                Destroy(gameObject); // Hasar verdik, mermiyi sil
+
+                // Kalkana Ã§arpan mermi hasar sayÄ±sÄ± gÃ¶stermez (kalkan kendi "BLOK" geri bildirimini verir)
+                if (IsParried && !(damagable is ShieldHitbox)) {
+                    GameEvents.DamageDealt(hit.point, ProjectileDamage, IsCrit);
+                }
+
+                if (IsParried && PierceRemaining > 0) {
+                    // Delici mermi hedefin iÃ§inden geÃ§ip yoluna devam eder
+                    PierceRemaining--;
+                    Move(moveDistance);
+                }
+                else {
+                    Destroy(gameObject); // Hasar verdik, mermiyi sil
+                }
             }
         }
         else {
-            // 3. Önümüzde hiçbir engel yoksa mermiyi manuel olarak ilerlet ve döndür
-            transform.position += Direction * moveDistance;
-
-            if (Direction != Vector3.zero) {
-                transform.rotation = Quaternion.LookRotation(Direction);
-            }
+            // 3. Ã–nÃ¼mÃ¼zde hiÃ§bir engel yoksa mermiyi manuel olarak ilerlet ve dÃ¶ndÃ¼r
+            Move(moveDistance);
         }
     }
 
-    public void BeParried(Vector3 newDirection, float newProjectileSpeed, float damageMultiplier) {
-        Direction = newDirection;
+    private void Move(float distance) {
+        transform.position += Direction * distance;
+
+        if (Direction != Vector3.zero) {
+            transform.rotation = Quaternion.LookRotation(Direction);
+        }
+    }
+
+    public void BeParried(Vector3 newDirection, float newProjectileSpeed, float damageMultiplier, bool isCrit = false, int pierce = 0) {
+        Direction = newDirection.normalized;
         ProjectileSpeed = newProjectileSpeed;
-        ProjectileDamage *= damageMultiplier;
+        ProjectileDamage *= damageMultiplier * ParryDamageBonus;
         IsParried = true;
+        IsCrit = isCrit;
+        PierceRemaining = pierce;
+
+        transform.rotation = Quaternion.LookRotation(Direction);
 
         defaultVisual.SetActive(false);
         reflectedVisual.SetActive(true);
+
+        if (isCrit) {
+            reflectedVisual.transform.localScale *= 1.4f;
+        }
+    }
+
+    // Ã‡atallanma iÃ§in: henÃ¼z savuÅŸturulmamÄ±ÅŸ hÃ¢linin bir kopyasÄ±nÄ± oluÅŸturur
+    public Bullet CreateUnparriedCopy() {
+        Bullet copy = Instantiate(this, transform.position, transform.rotation);
+        copy.ProjectileSpeed = ProjectileSpeed;
+        copy.ProjectileDamage = ProjectileDamage;
+        copy.ParryDamageBonus = ParryDamageBonus;
+        copy.LifeTime = LifeTime;
+        copy.Direction = Direction;
+        return copy;
     }
 
     public void Setup(float speedMultiplier) {
         ProjectileSpeed = speedMultiplier * LevelManager.Instance.CurrentDifficultyTier.bulletSpeed;
+    }
+
+    // BosslarÄ±n Ã¶zel mermileri iÃ§in
+    public void SetupCustom(Vector3 direction, float speed, float damage, float scale = 1f, float parryDamageBonus = 1f) {
+        Direction = direction.normalized;
+        ProjectileSpeed = speed;
+        ProjectileDamage = damage;
+        ParryDamageBonus = parryDamageBonus;
+
+        if (!Mathf.Approximately(scale, 1f)) {
+            transform.localScale *= scale;
+            bulletThickness *= scale;
+        }
     }
 
 }

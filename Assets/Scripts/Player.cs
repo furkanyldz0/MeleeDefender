@@ -6,10 +6,12 @@ public class Player : MonoBehaviour
 {
     public event EventHandler OnAttack;
     public event EventHandler OnSkillUsed;
+    public event Action OnDash;
 
     public static Player Instance { get; private set; }
     public int CurrentSkillPoint { get; set; } = 0;
-    public int MaxSkillPoint { get; private set; } = 20;
+    public int MaxSkillPoint => PlayerStats.Instance != null ? PlayerStats.Instance.SkillPointsRequired : 20;
+    public bool IsDashing => isDashing;
 
     [SerializeField] private Melee melee;
     [SerializeField] private TrailRenderer trail;
@@ -34,17 +36,21 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Confined; //bunu sonra bi config dosyasýnýn içine al yeri burasý deðil
+        Cursor.lockState = CursorLockMode.Confined; //bunu sonra bi config dosyasÄ±nÄ±n iÃ§ine al yeri burasÄ± deÄŸil
         rb = GetComponent<Rigidbody>();
 
         DisableTrail();
+
+        // KalÄ±cÄ± geliÅŸtirme: yetenek Ã§ubuÄŸu kÄ±smen dolu baÅŸlar
+        CurrentSkillPoint = Mathf.FloorToInt(MaxSkillPoint * PlayerStats.Instance.StartingSkillCharge);
     }
 
     private void Update() {
-        //Input taramasýný her karede, dash durumundan baðýmsýz olarak en baþta yap
+        //Input taramasÄ±nÄ± her karede, dash durumundan baÄŸÄ±msÄ±z olarak en baÅŸta yap
         TrackHorizontalInput();
 
-        if (isDashing) {
+        // MenÃ¼de, duraklatmada veya seviye atlama ekranÄ±ndayken saldÄ±rÄ±/yetenek alma
+        if (isDashing || !CanAct()) {
             return;
         }
 
@@ -54,10 +60,10 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash) {
             StartCoroutine(Dash());
         }
-        if (Input.GetMouseButtonDown(1) && CurrentSkillPoint == MaxSkillPoint) {
+        if (Input.GetMouseButtonDown(1) && CurrentSkillPoint >= MaxSkillPoint) {
             CurrentSkillPoint = 0;
             OnSkillUsed?.Invoke(this, EventArgs.Empty);
-            //özel skill
+            //Ã¶zel skill
         }
 
     }
@@ -67,9 +73,19 @@ public class Player : MonoBehaviour
             return;
         }
 
+        if (!CanAct()) {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            return;
+        }
+
         HandleMovement();
         LookAtMouse();
         //CalculateRotationSpeed();
+    }
+
+    private bool CanAct() {
+        return GameFlow.Instance == null || GameFlow.Instance.IsPlaying;
     }
 
     public void AddSkillPoint(int amount) {
@@ -83,22 +99,22 @@ public class Player : MonoBehaviour
     private void LookAtMouse() {
         Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane plane = new Plane(Vector3.up, transform.position);
-        //ray'in sadece düzlem ile çarpýþmasýna bakýyor
-        if (plane.Raycast(mouseRay, out float hitDist)) { //hitdist ray'in uzunluðu, getpoint ile çarptýðý yerin kordinatýný alýyoruz
+        //ray'in sadece dÃ¼zlem ile Ã§arpÄ±ÅŸmasÄ±na bakÄ±yor
+        if (plane.Raycast(mouseRay, out float hitDist)) { //hitdist ray'in uzunluÄŸu, getpoint ile Ã§arptÄ±ÄŸÄ± yerin kordinatÄ±nÄ± alÄ±yoruz
             Vector3 hitPoint = mouseRay.GetPoint(hitDist);
 
             Vector3 lookDirection = hitPoint - transform.position;
             lookDirection.y = 0f;
 
             float rotationLimit = 1f;
-            //konuma göre farenin konumunu kontrol ediyor, karakterin arkasýna düþmesi durumunda
+            //konuma gÃ¶re farenin konumunu kontrol ediyor, karakterin arkasÄ±na dÃ¼ÅŸmesi durumunda
             if (lookDirection.z < rotationLimit) {
-                //karakterin tam arkaya dönmemesi için
+                //karakterin tam arkaya dÃ¶nmemesi iÃ§in
                 lookDirection.z = rotationLimit + 0.001f;
             }
 
             if (lookDirection != Vector3.zero) {
-                // Yönü rotasyona çevir ve Rigidbody'e "Dön" de
+                // YÃ¶nÃ¼ rotasyona Ã§evir ve Rigidbody'e "DÃ¶n" de
                 Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
                 rb.MoveRotation(targetRotation);
             }
@@ -115,6 +131,7 @@ public class Player : MonoBehaviour
 
         canDash = false;
         isDashing = true;
+        OnDash?.Invoke();
         //rb.useGravity = false; //
         EnableTrail();
         rb.linearVelocity = dashDir * dashingPower;
@@ -134,27 +151,28 @@ public class Player : MonoBehaviour
     }
 
     private void HandleMovement() {
-        //çarpýþmadan kaynaklý sürtünme ve istenmeyen hareketleri engellemek için
-        //dash atarken metot okunmadýðý için sýkýntý yok
+        //Ã§arpÄ±ÅŸmadan kaynaklÄ± sÃ¼rtÃ¼nme ve istenmeyen hareketleri engellemek iÃ§in
+        //dash atarken metot okunmadÄ±ÄŸÄ± iÃ§in sÄ±kÄ±ntÄ± yok
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
         Vector2 inputVector = GetMovementVector2Normalized();
         Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
-        rb.MovePosition(rb.position + moveDir * moveSpeed * Time.fixedDeltaTime); //fixeddelta'da yazýcam 
+        float speed = moveSpeed * PlayerStats.Instance.MoveSpeedMultiplier;
+        rb.MovePosition(rb.position + moveDir * speed * Time.fixedDeltaTime); //fixeddelta'da yazÄ±cam 
     }
 
-    //a ve d'ye birlikte basýmlarda sýkýntý çýkabiliyor, onun için yazýldý
+    //a ve d'ye birlikte basÄ±mlarda sÄ±kÄ±ntÄ± Ã§Ä±kabiliyor, onun iÃ§in yazÄ±ldÄ±
     private void TrackHorizontalInput() {
-        // Yeni bir tuþa basýldýysa yönü doðrudan ona eþitle
+        // Yeni bir tuÅŸa basÄ±ldÄ±ysa yÃ¶nÃ¼ doÄŸrudan ona eÅŸitle
         if (Input.GetKeyDown(KeyCode.A)) currentXDirection = -1;
         if (Input.GetKeyDown(KeyCode.D)) currentXDirection = 1;
 
-        // Bir tuþtan el çekildiðinde, diðer tuþ hala basýlýysa yönü ona çevir
+        // Bir tuÅŸtan el Ã§ekildiÄŸinde, diÄŸer tuÅŸ hala basÄ±lÄ±ysa yÃ¶nÃ¼ ona Ã§evir
         if (Input.GetKeyUp(KeyCode.A) && Input.GetKey(KeyCode.D)) currentXDirection = 1;
         if (Input.GetKeyUp(KeyCode.D) && Input.GetKey(KeyCode.A)) currentXDirection = -1;
 
-        // Hiçbir tuþa basýlmýyorsa sýfýrla
+        // HiÃ§bir tuÅŸa basÄ±lmÄ±yorsa sÄ±fÄ±rla
         if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D)) currentXDirection = 0;
     }
 
@@ -188,7 +206,7 @@ public class Player : MonoBehaviour
 
 
     //private void CalculateRotationSpeed() {
-    //    // Sadece zaman akýyorsa hesaplama yap (Hata vermemesi için)
+    //    // Sadece zaman akÄ±yorsa hesaplama yap (Hata vermemesi iÃ§in)
     //    if (Time.fixedDeltaTime > 0f) {
     //        float angleDifference = Quaternion.Angle(lastFrameRotation, rb.rotation);
     //        float rawTurnSpeed = angleDifference / Time.fixedDeltaTime;
@@ -202,9 +220,9 @@ public class Player : MonoBehaviour
     //private void LookAtMouse() {
     //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
     //    Plane plane = new Plane(Vector3.up, transform.position);
-    //    //ray'in sadece düzlem ile çarpýþmasýna bakýyor
+    //    //ray'in sadece dÃ¼zlem ile Ã§arpÄ±ÅŸmasÄ±na bakÄ±yor
     //    if(plane.Raycast(mouseRay, out float hitDist)) {
-    //        Vector3 hitPoint = mouseRay.GetPoint(hitDist); //hitdist ray'in uzunluðu, getpoint ile çarptýðý yerin kordinatýný alýyoruz
+    //        Vector3 hitPoint = mouseRay.GetPoint(hitDist); //hitdist ray'in uzunluÄŸu, getpoint ile Ã§arptÄ±ÄŸÄ± yerin kordinatÄ±nÄ± alÄ±yoruz
     //        transform.LookAt(hitPoint);
     //    }
     //}
