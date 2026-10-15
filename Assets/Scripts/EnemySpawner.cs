@@ -49,14 +49,6 @@ public class EnemySpawnter : MonoBehaviour
         CheckPositions();
     }
 
-    //private void Enemy_OnAnyEnemyDied(Enemy enemy) {
-    //    if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
-    //        occupiedEnemyPositions.Remove(enemy);
-    //        currentEnemyCount--;
-    //        CheckPositions();
-    //    }
-    //}
-
     private void Enemy_OnAnyEnemyDied(object sender, Enemy.OnAnyEnemyDiedEventArgs e) {
         if(sender is Enemy enemy) {
             if (occupiedEnemyPositions.TryGetValue(enemy, out int index)) {
@@ -68,8 +60,8 @@ public class EnemySpawnter : MonoBehaviour
     }
 
     private void CalculateEnemySpace() {
-        //düşmanlar yatay uç değerlerde de olabileceği için +1 eklemeden eksik kalıyor
-        int totalEnemyCount = (int)((horizontalPositionRange.y - horizontalPositionRange.x) / horizontalSpace) + 1;
+        //düşmanlar yatay uç değerlerde de olabileceği için +1 eklemeden eksik kalıyor (+1 ile de eksik kalıyormuş)
+        int totalEnemyCount = (int)((horizontalPositionRange.y - horizontalPositionRange.x) / horizontalSpace) + 2;
         Debug.Log(totalEnemyCount);
 
         enemyPositions = new Vector3[totalEnemyCount];
@@ -120,13 +112,18 @@ public class EnemySpawnter : MonoBehaviour
 
     private void SpawnEnemy(int positionIndex) {
         EnemyTypeSO type = PickTypeToSpawn();
-        var enemy = Instantiate(type.prefab, transform.position, Quaternion.identity);
+        var enemy = Instantiate(type.prefab, transform.position, Quaternion.LookRotation(transform.forward));
         enemy.TypeData = type;
-        enemy.IsSpawning = true;
+        //enemy.IsSpawning = true;
+        enemy.Setup(true, enemyFirstAttackTime);
+
+        enemy.transform.position = new Vector3(enemyPositions[positionIndex].x, enemyPositions[positionIndex].y,
+            enemyPositions[positionIndex].z + 5f);
 
         enemy.transform.DOMove(enemyPositions[positionIndex], 1f)
             .SetDelay(Random.Range(.5f + enemySpawnTimeOffset, 1.5f + enemySpawnTimeOffset * 3)) //1-4
             .SetLink(enemy.gameObject)
+            //.SetEase(Ease.OutSine)
             .OnComplete(() => {
                 enemy.Setup(false, enemyFirstAttackTime);
             });

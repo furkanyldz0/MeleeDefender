@@ -18,9 +18,7 @@ MonoBehaviour:
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 0.1
     bulletSpeed: 5
-    specialEnemies:
-    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
-      count: 0
+    specialEnemies: []
   - requiredScore: 5
     totalEnemyCount: 3
     enemySpawnTimeOffset: 0.5

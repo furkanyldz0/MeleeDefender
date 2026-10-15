@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 {
@@ -11,11 +10,11 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
         public int scoreToKill;
     }
 
-    [SerializeField] private Weapon weapon;
+    [SerializeField] private Staff staff;
     [SerializeField] private float bulletSpeedMultiplier = 1f;
     [SerializeField] private int defaultAttackCount = 1;
-    [SerializeField] private float attackInterval = 0f;
     [SerializeField] private int scoreToKill = 1;
+    [SerializeField] private Animator animator;
 
     public EnemyTypeSO TypeData { get; set; }
     public float Health { get; set; } = 100f;
@@ -25,51 +24,37 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
     private float maxHealth;
     private float attackTime = 2.5f;
     private float attackTimeDelta;
-    private float attackIntervalDelta;
-    private int attackCount; 
+    private bool isAttacking = false;
 
     private DamageFlash damageFlash;
 
-    private void Start()
-    {
+    private void Start() {
         damageFlash = GetComponent<DamageFlash>();
 
         maxHealth = Health;
         attackTimeDelta = attackTime;
-        attackIntervalDelta = attackInterval;
-        attackCount = defaultAttackCount;
+
+        staff.OnAttackFinished += Weapon_OnAttackFinished;
 
         OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
             currentHealthNormalized = Health / maxHealth
         });
     }
 
-    private void Update()
-    {
-        if (IsSpawning)
+    private void Weapon_OnAttackFinished(object sender, EventArgs e) {
+        isAttacking = false;
+        attackTimeDelta = attackTime;
+    }
+
+    private void Update() {
+        if (IsSpawning || isAttacking)
             return;
 
-        if(attackTimeDelta > 0) {
-            attackTimeDelta -= Time.deltaTime;
-        }
-        else if(attackTimeDelta <= 0) {
+        attackTimeDelta -= Time.deltaTime;
 
-            if (attackCount > 0) {
-                if (attackIntervalDelta > 0) {
-                    attackIntervalDelta -= Time.deltaTime;
-                }
-                else if (attackIntervalDelta <= 0) {
-                    weapon.Shoot(bulletSpeedMultiplier);
-                    attackIntervalDelta = attackInterval;
-                    attackCount--;
-                }
-            }
-            else if (attackCount == 0) {
-                attackIntervalDelta = attackInterval;
-                attackTimeDelta = attackTime;
-                attackCount = defaultAttackCount;
-            }
-            
+        if (attackTimeDelta <= 0f) {
+            isAttacking = true;
+            staff.PrepareToShoot(bulletSpeedMultiplier, transform.forward, defaultAttackCount);
         }
     }
 
@@ -77,9 +62,15 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
         IsSpawning = isSpawning;
         FirstAttackTime = firstAttackTime;
         attackTimeDelta = FirstAttackTime;
+
+        animator.SetBool("IsSpawning", IsSpawning);
     }
 
     public void Damage(float DamageAmount) {
+        if (IsSpawning) {
+            return;
+        }
+
         Health -= DamageAmount;
         OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
             currentHealthNormalized = Health / maxHealth
@@ -104,4 +95,9 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
         });
     }
 
+    private void OnDestroy() {
+        if (staff != null) {
+            staff.OnAttackFinished -= Weapon_OnAttackFinished;
+        }
+    }
 }

@@ -9,6 +9,8 @@ public class Bullet : MonoBehaviour {
     [SerializeField] private GameObject defaultVisual;
     [SerializeField] private GameObject reflectedVisual;
 
+    [SerializeField] private ParticleSystem impactEffect;
+
     public float ProjectileSpeed { get; set; }
     public float LifeTime { get; set; } = 20f;
     public float ProjectileDamage { get; set; } = 34f;
@@ -37,7 +39,7 @@ public class Bullet : MonoBehaviour {
             // Çarptýðýmýz obje sekme katmaný deðilse ve hasar alabiliyorsa
             else if (hit.collider.TryGetComponent<IDamagable>(out IDamagable damagable)) {
                 damagable.Damage(ProjectileDamage);
-                Destroy(gameObject); // Hasar verdik, mermiyi sil
+                Die(hit.point); // Hasar verdik, mermiyi sil
             }
         }
         else {
@@ -48,6 +50,12 @@ public class Bullet : MonoBehaviour {
                 transform.rotation = Quaternion.LookRotation(Direction);
             }
         }
+    }
+
+    public void Die(Vector3 impactPosition) {
+        var effect = Instantiate(impactEffect, impactPosition, Quaternion.identity);
+        Destroy(effect.gameObject, effect.main.duration + 1);
+        Destroy(gameObject);
     }
 
     public void BeParried(Vector3 newDirection, float newProjectileSpeed, float damageMultiplier) {

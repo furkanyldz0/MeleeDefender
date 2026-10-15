@@ -8,13 +8,14 @@ public class DamageFlash : MonoBehaviour
     [SerializeField] private float flashTime = 0.25f;
     [SerializeField] private AnimationCurve flashSpeedCurve;
 
-    private MeshRenderer[] meshRenderers;
+    //private MeshRenderer[] meshRenderers;
+    private Renderer[] meshRenderers; //skinned mesh kullandýðýmýz için
     private Material[] materials;
 
     private Coroutine damageFlashCoroutine;
 
     private void Awake() {
-        meshRenderers = GetComponentsInChildren<MeshRenderer>();
+        meshRenderers = GetComponentsInChildren<Renderer>();
 
         Init();
     }

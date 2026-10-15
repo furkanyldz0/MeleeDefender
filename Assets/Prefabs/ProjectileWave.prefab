@@ -55,7 +55,7 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 128
-  hitboxSize: {x: 2.5, y: 1, z: 0.5}
+  hitboxSize: {x: 2.5, y: 2, z: 0.5}
   impactEffect: {fileID: 5885339532838503758, guid: eb8bd5e615a023f4fb9fb33e810c27a6, type: 3}
 --- !u!1 &4728724343463569839
 GameObject:
