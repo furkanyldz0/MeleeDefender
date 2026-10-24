@@ -15,7 +15,9 @@ public class Melee : MonoBehaviour {
     [SerializeField] private Vector3 hitboxSize = new Vector3(1f, 2f, 1f);
     [SerializeField] private LayerMask bulletLayer;
     [SerializeField] private ParticleSystem impactEffect;
-    [SerializeField] private Transform trailRendererParent;
+    //[SerializeField] private Transform trailRendererParent;
+    [SerializeField] private List<TrailRenderer> defaultTrails = new List<TrailRenderer>();
+    [SerializeField] private List<TrailRenderer> skillTrails = new List<TrailRenderer>();
 
     [SerializeField] private ProjectileWaveSkill projectileWaveSkill;
 
@@ -25,16 +27,18 @@ public class Melee : MonoBehaviour {
     private List<Collider> alreadyHitBullets = new List<Collider>();
     private float attackDuration = 0.1f;
 
-    private List<TrailRenderer> trails = new List<TrailRenderer>();
+    //private List<TrailRenderer> defaultTrails = new List<TrailRenderer>();
+    //private List<TrailRenderer> skillTrails = new List<TrailRenderer>();
 
     private Coroutine skillAttackCouroutine;
 
     private void Start() {
         Player.Instance.OnAttack += Player_OnAttack;
 
-        trails = GetComponentsInChildren<TrailRenderer>().ToList();
+        //defaultTrails = GetComponentsInChildren<TrailRenderer>().ToList();
 
-        DisableTrails();
+        DisableDefaultTrails();
+        DisableSkillTrails();
     }
 
     private void Update() {
@@ -66,11 +70,11 @@ public class Melee : MonoBehaviour {
             .SetTarget(transform)
             .OnStart(() => {
                 EnableHitbox();
-                EnableTrails();
+                EnableDefaultTrails();
             })
             .OnComplete(() => {
                 DisableHitbox();
-                DisableTrails();
+                DisableDefaultTrails();
             });
 
             comboStep = 2;
@@ -84,12 +88,12 @@ public class Melee : MonoBehaviour {
             .SetTarget(transform)
             .OnStart(() => {
                 EnableHitbox();
-                EnableTrails();
+                EnableDefaultTrails();
 
             })
             .OnComplete(() => {
                 DisableHitbox();
-                DisableTrails();
+                DisableDefaultTrails();
             });
 
             comboStep = 1;
@@ -105,11 +109,11 @@ public class Melee : MonoBehaviour {
             .SetEase(Ease.OutQuad)
             .SetTarget(transform)
             .OnStart(() => {
-                EnableTrails();
+                EnableSkillTrails();
 
             })
             .OnComplete(() => {
-                DisableTrails();
+                DisableSkillTrails();
             });
 
             comboStep = 2;
@@ -121,11 +125,11 @@ public class Melee : MonoBehaviour {
             .SetEase(Ease.OutQuad)
             .SetTarget(transform).
             OnStart(() => {
-                EnableTrails();
+                EnableSkillTrails();
 
             })
             .OnComplete(() => {
-                DisableTrails();
+                DisableSkillTrails();
             });
 
             comboStep = 1;
@@ -188,13 +192,24 @@ public class Melee : MonoBehaviour {
         isHitboxActive = false;
     }
 
-    private void EnableTrails() {
-        foreach(TrailRenderer t in trails) {
+    private void EnableDefaultTrails() {
+        foreach(TrailRenderer t in defaultTrails) {
             t.emitting = true;
         }
     }
-    private void DisableTrails() {
-        foreach (TrailRenderer t in trails) {
+    private void DisableDefaultTrails() {
+        foreach (TrailRenderer t in defaultTrails) {
+            t.emitting = false;
+        }
+    }
+
+    private void EnableSkillTrails() {
+        foreach (TrailRenderer t in skillTrails) {
+            t.emitting = true;
+        }
+    }
+    private void DisableSkillTrails() {
+        foreach (TrailRenderer t in skillTrails) {
             t.emitting = false;
         }
     }

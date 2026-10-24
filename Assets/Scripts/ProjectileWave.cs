@@ -65,7 +65,10 @@ public class ProjectileWave : MonoBehaviour {
 
                 // 3. Mermi Kontrolü (Sol ve sað kutular mermileri hala temizleyebilir)
                 if ((bulletLayer.value & (1 << hitObjLayer)) > 0) {
-                    Destroy(hit.collider.gameObject);
+                    //Destroy(hit.collider.gameObject);
+                    if(hit.collider.gameObject.TryGetComponent<Bullet>(out Bullet bullet)) {
+                        bullet.Die(bullet.transform.position);
+                    }
                     continue;
                 }
 

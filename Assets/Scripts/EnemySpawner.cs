@@ -60,8 +60,8 @@ public class EnemySpawnter : MonoBehaviour
     }
 
     private void CalculateEnemySpace() {
-        //düþmanlar yatay uç deðerlerde de olabileceði için +1 eklemeden eksik kalýyor (+1 ile de eksik kalýyormuþ)
-        int totalEnemyCount = (int)((horizontalPositionRange.y - horizontalPositionRange.x) / horizontalSpace) + 2;
+        //düþmanlar yatay uç deðerlerde de olabileceði için +1 eklemeden eksik kalýyor
+        int totalEnemyCount = (int)((horizontalPositionRange.y - horizontalPositionRange.x) / horizontalSpace) + 1;
         Debug.Log(totalEnemyCount);
 
         enemyPositions = new Vector3[totalEnemyCount];

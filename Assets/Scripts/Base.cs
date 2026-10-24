@@ -10,17 +10,28 @@ public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
 
     public float Health { get; set; } = 400f; //400f
     private float currentHealth;
+    private float regenerationRate = 2f;
 
-    private DamageFlash damageFlash;
+    private DamageFlashAlt damageFlash;
 
     private void Start() {
-        damageFlash = GetComponent<DamageFlash>();
+        damageFlash = GetComponent<DamageFlashAlt>();
 
         currentHealth = Health;
 
         OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
             currentHealthNormalized = currentHealth / Health
         }); //baþta can barýný gizlesin
+    }
+
+    private void FixedUpdate() {
+        if(currentHealth < Health) {
+            currentHealth += regenerationRate * Time.fixedDeltaTime;
+
+            OnHealthChanged?.Invoke(this, new IHasHealthBar.OnHealthChangedEventArgs {
+                currentHealthNormalized = currentHealth / Health
+            });
+        }
     }
 
     public void Damage(float damageAmount) {

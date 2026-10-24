@@ -13,6 +13,8 @@ public class Player : MonoBehaviour
 
     [SerializeField] private Melee melee;
     [SerializeField] private TrailRenderer trail;
+    [SerializeField] private Animator animator;
+    //[SerializeField] private Transform aimPivot;
 
     private Rigidbody rb;
     private float moveSpeed = 5f;
@@ -23,7 +25,6 @@ public class Player : MonoBehaviour
     private float dashingPower = 40f;
     private float dashingTime = 0.05f;
     private float dashingCooldown = 0f;
-    
 
     private void Awake() {
         if(Instance != null) {
@@ -44,6 +45,8 @@ public class Player : MonoBehaviour
         //Input taramasýný her karede, dash durumundan baðýmsýz olarak en baþta yap
         TrackHorizontalInput();
 
+        //LookAtMouse(); ayrý olarak döndürmek için
+
         if (isDashing) {
             return;
         }
@@ -60,6 +63,10 @@ public class Player : MonoBehaviour
             //özel skill
         }
 
+        //Vector2 inputVector = GetMovementVector2Normalized();
+        //bool isRunning = inputVector != Vector2.zero;
+        //animator.SetBool("IsRunning", isRunning);
+
     }
 
     private void FixedUpdate() {
@@ -69,7 +76,7 @@ public class Player : MonoBehaviour
 
         HandleMovement();
         LookAtMouse();
-        //CalculateRotationSpeed();
+
     }
 
     public void AddSkillPoint(int amount) {
@@ -104,6 +111,29 @@ public class Player : MonoBehaviour
             }
         }
     }
+    //private void LookAtMouse() { //ayrý olarak döndürmek için
+    //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //    Plane plane = new Plane(Vector3.up, transform.position);
+
+    //    if (plane.Raycast(mouseRay, out float hitDist)) {
+    //        Vector3 hitPoint = mouseRay.GetPoint(hitDist);
+
+    //        Vector3 lookDirection = hitPoint - transform.position;
+    //        lookDirection.y = 0f;
+
+    //        float rotationLimit = 1f;
+    //        if (lookDirection.z < rotationLimit) {
+    //            lookDirection.z = rotationLimit + 0.001f;
+    //        }
+
+    //        if (lookDirection != Vector3.zero) {
+    //            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+
+    //            // DEÐÝÞEN KISIM: rb.MoveRotation yerine aimPivot'u döndürüyoruz
+    //            aimPivot.rotation = targetRotation;
+    //        }
+    //    }
+    //}
 
     private IEnumerator Dash() {
         Vector2 inputVector = GetMovementVector2Normalized();
@@ -142,6 +172,9 @@ public class Player : MonoBehaviour
         Vector2 inputVector = GetMovementVector2Normalized();
         Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
         rb.MovePosition(rb.position + moveDir * moveSpeed * Time.fixedDeltaTime); //fixeddelta'da yazýcam 
+
+        bool isRunning = moveDir != Vector3.zero;
+        animator.SetBool("IsRunning", isRunning);
     }
 
     //a ve d'ye birlikte basýmlarda sýkýntý çýkabiliyor, onun için yazýldý
