@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   bulletPrefab: {fileID: 7368486947655323031, guid: be58d66745cc1e245a99df09ac17ca73, type: 3}
   fireTransform: {fileID: 2321932722940642077}
+  spellCastClip: {fileID: 8300000, guid: 691f6b85332c6874ab7d1564c153b245, type: 3}
 --- !u!114 &4845645748074204517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -325,6 +326,22 @@ MonoBehaviour:
   defaultAttackCount: 1
   scoreToKill: 1
   animator: {fileID: 307392841953818427}
+  hitSoundClips:
+  - {fileID: 8300000, guid: 3064ba462a676cc42b78a6b58e451a33, type: 3}
+  - {fileID: 8300000, guid: 803365288c106b84eb08ae243dd3c650, type: 3}
+  - {fileID: 8300000, guid: cb704835d1bb2164daa13dc6ffa84af0, type: 3}
+  - {fileID: 8300000, guid: ccda0b5e8e627394b999079b60170dec, type: 3}
+  - {fileID: 8300000, guid: d469f84158005ee44a6c96c15a4f312c, type: 3}
+  - {fileID: 8300000, guid: a129c37927e2545469b8d25d691d8f21, type: 3}
+  - {fileID: 8300000, guid: 531c2425bc54c264ab528bee196fa558, type: 3}
+  - {fileID: 8300000, guid: 5371a7248bdc035489072aaff360256c, type: 3}
+  - {fileID: 8300000, guid: b17556a4482ddf84ba262bfad15cb513, type: 3}
+  - {fileID: 8300000, guid: 33e5b3d10dee2d24dbfc70b23e70c6da, type: 3}
+  deathSoundClips:
+  - {fileID: 8300000, guid: 08dac46cc30a9aa42ab513abf11bd61b, type: 3}
+  - {fileID: 8300000, guid: ea2297f751e35df43999556e5507a0fd, type: 3}
+  - {fileID: 8300000, guid: 016f7ac3087da6c459c8cc992160e44d, type: 3}
+  - {fileID: 8300000, guid: d355de94d1e920443bfcca8705748e5e, type: 3}
 --- !u!114 &6427564455364694615
 MonoBehaviour:
   m_ObjectHideFlags: 0

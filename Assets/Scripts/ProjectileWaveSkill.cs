@@ -12,6 +12,9 @@ public class ProjectileWaveSkill : MonoBehaviour {
     [SerializeField] private ParticleSystem skillActiveEffect;
     [SerializeField] private ParticleSystem skillEndEffect;
 
+    [SerializeField] private AudioClip skillUsedSoundClip;
+    [SerializeField] private AudioClip skillAttackSoundClip;
+
     // Yaratýlan efektleri hafýzada tutacaðýmýz referanslar
     private ParticleSystem spawnedActiveEffect;
     private ParticleSystem spawnedEndEffect;
@@ -42,6 +45,7 @@ public class ProjectileWaveSkill : MonoBehaviour {
         IsActive = true;
 
         PlayActiveEffect();
+        SoundFXManager.Instance.PlaySoundFXClip(skillUsedSoundClip, transform, 0.9f);
 
         float elapsed = 0f;
         while (elapsed < duration) {
@@ -70,6 +74,7 @@ public class ProjectileWaveSkill : MonoBehaviour {
 
     private IEnumerator AttackCoroutine(float waitDuration) {
         SendProjectileWave();
+        SoundFXManager.Instance.PlaySoundFXClip(skillAttackSoundClip, transform, 0.9f);
 
         yield return new WaitForSeconds(waitDuration);
 

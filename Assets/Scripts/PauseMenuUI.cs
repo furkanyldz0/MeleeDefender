@@ -2,13 +2,23 @@ using UnityEngine;
 
 public class PauseMenuUI : MonoBehaviour
 {
+    public static PauseMenuUI Instance { get; private set; } //isgamepaused'a eriþmek için singleton yaptýk
+
     [SerializeField] private GameObject pauseMenuUI;
-    private bool isGamePaused;
+
+    public bool IsGamePaused { get; private set; }
+
+    private void Awake() {
+        if(Instance != null) {
+            Debug.LogError("Sahnede birden fazla PauseMenuUI Instance'i var!");
+        }
+        Instance = this;
+    }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            if (isGamePaused) {
+            if (IsGamePaused) {
                 Resume();
             }
             else {
@@ -20,13 +30,13 @@ public class PauseMenuUI : MonoBehaviour
     public void Resume() {
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
-        isGamePaused = false;
+        IsGamePaused = false;
     }
 
     public void Pause() {
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
-        isGamePaused = true;
+        IsGamePaused = true;
     }
 
 }

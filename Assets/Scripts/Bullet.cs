@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour {
     [SerializeField] private GameObject reflectedVisual;
 
     [SerializeField] private ParticleSystem impactEffect;
+    [SerializeField] private AudioClip[] impactSoundClips;
 
     public float ProjectileSpeed { get; set; }
     public float LifeTime { get; set; } = 20f;
@@ -54,6 +55,9 @@ public class Bullet : MonoBehaviour {
 
     public void Die(Vector3 impactPosition) {
         var effect = Instantiate(impactEffect, impactPosition, Quaternion.identity);
+
+        SoundFXManager.Instance.PlayRandomSoundFXClip(impactSoundClips, transform, 0.3f);
+
         Destroy(effect.gameObject, effect.main.duration + 1);
         Destroy(gameObject);
     }

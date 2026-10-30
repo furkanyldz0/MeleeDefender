@@ -226,6 +226,26 @@ PrefabInstance:
       propertyPath: reflectedVisual
       value: 
       objectReference: {fileID: 7247786909457691765}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: impactSoundClips.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: 'impactSoundClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: faacfae39db6fbf4e8a3c9d2b5c4097d, type: 3}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: 'impactSoundClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 04d24b6dcc4cff74a904b8ef950319cf, type: 3}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: 'impactSoundClips.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 46efac8e8bef4a543a805eae5b6a2ba7, type: 3}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: 'impactSoundClips.Array.data[3]'
+      value: 
+      objectReference: {fileID: 8300000, guid: a5f7102612d18a043a8b8cdb63c9e861, type: 3}
     - target: {fileID: 2507650090158415432, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

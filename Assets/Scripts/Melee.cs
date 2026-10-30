@@ -21,6 +21,10 @@ public class Melee : MonoBehaviour {
 
     [SerializeField] private ProjectileWaveSkill projectileWaveSkill;
 
+
+    [SerializeField] private AudioClip[] attackSoundClips;
+    [SerializeField] private AudioClip parrySoundClip;
+
     private int comboStep = 1;
 
     private bool isHitboxActive = false;
@@ -55,7 +59,7 @@ public class Melee : MonoBehaviour {
         }
         else {
             DefaultAttack();
-        } 
+        }
     }
 
     private void DefaultAttack() {
@@ -98,6 +102,8 @@ public class Melee : MonoBehaviour {
 
             comboStep = 1;
         }
+
+        SoundFXManager.Instance.PlayRandomSoundFXClip(attackSoundClips, transform, 0.6f, true);
     }
 
     private IEnumerator SkillAttackCoroutine(float attackTime) {
@@ -138,6 +144,7 @@ public class Melee : MonoBehaviour {
         yield return new WaitForSeconds(attackTime);
 
         skillAttackCouroutine = null;
+        DisableSkillTrails(); //açýk kalabiliyor
     }
 
     private void ParryBullet(Bullet bullet) { //düþman parrylerse deðiþiriz, þuan sadece player
@@ -148,11 +155,13 @@ public class Melee : MonoBehaviour {
 
         float parriedBulletSpeed = bullet.ProjectileSpeed * 5f;
 
-        Debug.Log(this + " hasar çarpaný: " + finalDamageMultiplier);
+        //Debug.Log(this + " hasar çarpaný: " + finalDamageMultiplier);
 
         bullet.BeParried(Player.Instance.transform.forward, parriedBulletSpeed, finalDamageMultiplier);
         Player.Instance.AddSkillPoint(1);
         OnParried?.Invoke(this, EventArgs.Empty);
+
+        SoundFXManager.Instance.PlaySoundFXClip(parrySoundClip, transform, 1f, true);
     }
 
     private void CheckHits() {
@@ -170,6 +179,7 @@ public class Melee : MonoBehaviour {
                         ParryBullet(bullet);
                         PlayImpactEffect(bullet.transform.position);
                         HitStop.Instance.StopTime(0.02f);
+                        CameraController.Instance.ShakeCamera();
                     }
                 }
 

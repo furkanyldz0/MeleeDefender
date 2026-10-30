@@ -93,6 +93,18 @@ PrefabInstance:
       propertyPath: reflectedVisual
       value: 
       objectReference: {fileID: 2138181453208107267}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: impactSoundClips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: 'impactSoundClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 73b1ff2ab0666fc42a5cd7731d894aea, type: 3}
+    - target: {fileID: 92384464740175119, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
+      propertyPath: 'impactSoundClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: e42bda609aa168b48b25d3d70329bca4, type: 3}
     - target: {fileID: 2507650090158415432, guid: 9588641cc20ba6441af6ead37a253019, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

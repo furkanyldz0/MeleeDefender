@@ -14,7 +14,8 @@ public class Player : MonoBehaviour
     [SerializeField] private Melee melee;
     [SerializeField] private TrailRenderer trail;
     [SerializeField] private Animator animator;
-    //[SerializeField] private Transform aimPivot;
+
+    [SerializeField] private AudioClip dashSoundClip;
 
     private Rigidbody rb;
     private float moveSpeed = 5f;
@@ -42,10 +43,13 @@ public class Player : MonoBehaviour
     }
 
     private void Update() {
+
+        if (PauseMenuUI.Instance.IsGamePaused) {
+            return;
+        }
+
         //Input taramasýný her karede, dash durumundan baðýmsýz olarak en baþta yap
         TrackHorizontalInput();
-
-        //LookAtMouse(); ayrý olarak döndürmek için
 
         if (isDashing) {
             return;
@@ -148,11 +152,14 @@ public class Player : MonoBehaviour
         //rb.useGravity = false; //
         EnableTrail();
         rb.linearVelocity = dashDir * dashingPower;
+        SoundFXManager.Instance.PlaySoundFXClip(dashSoundClip, transform, 0.7f, true);
+
         yield return new WaitForSeconds(dashingTime);
 
         isDashing = false;
         DisableTrail();
         rb.linearVelocity = Vector3.zero;
+
         yield return new WaitForSeconds(dashingCooldown);
 
         canDash = true;
@@ -218,19 +225,6 @@ public class Player : MonoBehaviour
     public Melee GetMelee() {
         return melee;
     }
-
-
-    //private void CalculateRotationSpeed() {
-    //    // Sadece zaman akýyorsa hesaplama yap (Hata vermemesi için)
-    //    if (Time.fixedDeltaTime > 0f) {
-    //        float angleDifference = Quaternion.Angle(lastFrameRotation, rb.rotation);
-    //        float rawTurnSpeed = angleDifference / Time.fixedDeltaTime;
-
-    //        CurrentTurnSpeed = Mathf.Clamp(rawTurnSpeed, 0f, 1500f);
-    //    }
-
-    //    lastFrameRotation = rb.rotation;
-    //}
 
     //private void LookAtMouse() {
     //    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);

@@ -10,6 +10,10 @@ public class SkillBarUI : MonoBehaviour
     [SerializeField] private ParticleSystem skillReadyEffect;
     [SerializeField] private ParticleSystem skillUsedEffect;
 
+    [SerializeField] private AudioClip skillReadySoundClip;
+
+    private bool isBarFilled;
+
     private void Start() {
         UIManager.Instance.OnSkillProgressChanged += UIManager_OnSkillProgressChanged;
         skill.OnSkillProgressChanged += Skill_OnSkillProgressChanged;
@@ -33,13 +37,18 @@ public class SkillBarUI : MonoBehaviour
     private void ChangeProgress(float progressNormalized) {
         barImage.fillAmount = progressNormalized;
 
-        if(progressNormalized == 1f) {
+        if(progressNormalized == 1f && !isBarFilled) {
             EnableSkillReadyEffect();
             PlaySkillReadyAnimation();
+            SoundFXManager.Instance.PlaySoundFXClip(skillReadySoundClip, transform, 0.9f);
+
+            isBarFilled = true;
         }
         else if(progressNormalized == 0f) {
             DisableEffects();
             PlaySkillEndedAnimation();
+
+            isBarFilled = false;
         }
     }
 

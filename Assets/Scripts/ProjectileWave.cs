@@ -48,25 +48,31 @@ public class ProjectileWave : MonoBehaviour {
             foreach (RaycastHit hit in hits) {
                 int hitObjLayer = hit.collider.gameObject.layer;
 
+                // --- UNITY (0,0,0) BUG'I ÇÖZÜMÜ ---
+                Vector3 validImpactPoint = hit.point;
+
+                // Eðer hit.distance 0 ise, BoxCast bu objenin içinde baþlamýþ demektir ve hit.point (0,0,0) döner.
+                if (hit.distance == 0f) {
+                    // Objenin yüzeyindeki bize en yakýn noktayý hesapla
+                    validImpactPoint = hit.collider.ClosestPoint(segmentWorldCenter);
+                }
+                // ----------------------------------
+
                 // 2. Duvar Temasý Kontrolü
                 if ((wallLayer.value & (1 << hitObjLayer)) > 0) {
 
                     // SADECE ORTA KUTU (i == 1) duvara çarptýysa dalgayý yok et
                     if (i == 1) {
-                        PlayImpactEffect(hit.point);
+                        PlayImpactEffect(validImpactPoint); // ARTIK hit.point YERÝNE BAZEN DÜZELTTÝÐÝMÝZ NOKTAYI VERÝYORUZ
                         Destroy(gameObject);
                         return; // Dalga tamamen yok oldu
                     }
-
-                    // Eðer 0 (Sol) veya 2 (Sað) kutu duvara çarptýysa hiçbir þey yapma!
-                    // continue diyerek duvarý es geçmesini ve sýradaki temasa bakmasýný saðlýyoruz.
                     continue;
                 }
 
                 // 3. Mermi Kontrolü (Sol ve sað kutular mermileri hala temizleyebilir)
                 if ((bulletLayer.value & (1 << hitObjLayer)) > 0) {
-                    //Destroy(hit.collider.gameObject);
-                    if(hit.collider.gameObject.TryGetComponent<Bullet>(out Bullet bullet)) {
+                    if (hit.collider.gameObject.TryGetComponent<Bullet>(out Bullet bullet)) {
                         bullet.Die(bullet.transform.position);
                     }
                     continue;
@@ -79,7 +85,7 @@ public class ProjectileWave : MonoBehaviour {
 
                         if (hit.collider.TryGetComponent<IDamagable>(out IDamagable damagable)) {
                             damagable.Damage(projectileDamage);
-                            PlayImpactEffect(hit.point);
+                            PlayImpactEffect(validImpactPoint); // ARTIK hit.point YERÝNE BAZEN DÜZELTTÝÐÝMÝZ NOKTAYI VERÝYORUZ
                         }
                     }
                 }

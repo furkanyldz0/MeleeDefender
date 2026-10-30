@@ -2,7 +2,7 @@ using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawnter : MonoBehaviour
+public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private EnemyTypeSO normalEnemyType;
 
@@ -114,8 +114,7 @@ public class EnemySpawnter : MonoBehaviour
         EnemyTypeSO type = PickTypeToSpawn();
         var enemy = Instantiate(type.prefab, transform.position, Quaternion.LookRotation(transform.forward));
         enemy.TypeData = type;
-        //enemy.IsSpawning = true;
-        enemy.Setup(true, enemyFirstAttackTime);
+        enemy.Setup(true, false, enemyFirstAttackTime); //ispawning'in true olmasý lazým yoksa pozisyona gelmeden önce ateþ etmeye baþlýyor
 
         enemy.transform.position = new Vector3(enemyPositions[positionIndex].x, enemyPositions[positionIndex].y,
             enemyPositions[positionIndex].z + 5f);
@@ -124,8 +123,11 @@ public class EnemySpawnter : MonoBehaviour
             .SetDelay(Random.Range(.5f + enemySpawnTimeOffset, 1.5f + enemySpawnTimeOffset * 3)) //1-4
             .SetLink(enemy.gameObject)
             //.SetEase(Ease.OutSine)
+            .OnStart(() => {
+                enemy.Setup(true, true, enemyFirstAttackTime);
+            })
             .OnComplete(() => {
-                enemy.Setup(false, enemyFirstAttackTime);
+                enemy.Setup(false, true, enemyFirstAttackTime);
             });
 
         occupiedEnemyPositions[enemy] = positionIndex;

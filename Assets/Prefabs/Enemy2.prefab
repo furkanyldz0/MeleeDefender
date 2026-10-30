@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: bulletPrefab
       value: 
       objectReference: {fileID: 4399349141347968054, guid: fa68855199de2a54387da2dffb1129d8, type: 3}
+    - target: {fileID: 937632372575852334, guid: ae5b85e9825eac74e830f858cc20a540, type: 3}
+      propertyPath: spellCastClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7ed8a7a79164e5145beaa807e17003aa, type: 3}
     - target: {fileID: 2100111548713916684, guid: ae5b85e9825eac74e830f858cc20a540, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

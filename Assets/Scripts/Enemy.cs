@@ -16,6 +16,9 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
     [SerializeField] private int scoreToKill = 1;
     [SerializeField] private Animator animator;
 
+    [SerializeField] private AudioClip[] hitSoundClips;
+    [SerializeField] private AudioClip[] deathSoundClips;
+
     public EnemyTypeSO TypeData { get; set; }
     public float Health { get; set; } = 100f;
     public bool IsSpawning { get; set; } = false;
@@ -25,6 +28,7 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
     private float attackTime = 2.5f;
     private float attackTimeDelta;
     private bool isAttacking = false;
+    private bool isDamageable;
 
     private DamageFlash damageFlash;
 
@@ -58,8 +62,9 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
         }
     }
 
-    public void Setup(bool isSpawning, float firstAttackTime) {
+    public void Setup(bool isSpawning, bool isDamageable, float firstAttackTime) {
         IsSpawning = isSpawning;
+        this.isDamageable = isDamageable;
         FirstAttackTime = firstAttackTime;
         attackTimeDelta = FirstAttackTime;
 
@@ -67,7 +72,7 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
     }
 
     public void Damage(float DamageAmount) {
-        if (IsSpawning) {
+        if (!isDamageable) {
             return;
         }
 
@@ -78,6 +83,10 @@ public class Enemy : MonoBehaviour, IDamagable, IHasHealthBar
 
         if (Health <= 10) {
             StartCoroutine(DelayDie(0.15f));
+            SoundFXManager.Instance.PlayRandomSoundFXClip(deathSoundClips, transform, 0.6f, true);
+        }
+        else {
+            SoundFXManager.Instance.PlayRandomSoundFXClip(hitSoundClips, transform, 0.6f, true);
         }
 
         damageFlash.CallDamageFlash();

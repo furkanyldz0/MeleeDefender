@@ -14,6 +14,8 @@ public class Staff : MonoBehaviour {
     [SerializeField] private Bullet bulletPrefab;
     [SerializeField] private Transform fireTransform;
 
+    [SerializeField] private AudioClip spellCastClip;
+
     private Vector3 bulletDirection;
     private float speedMultiplier = 1f;
     private int remainingCount;
@@ -38,6 +40,8 @@ public class Staff : MonoBehaviour {
 
         var bullet = Instantiate(bulletPrefab, fireTransform.position, Quaternion.LookRotation(bulletDirection));
         bullet.Setup(speedMultiplier);
+
+        SoundFXManager.Instance.PlaySoundFXClip(spellCastClip, transform, 0.5f);
 
         remainingCount--;
 
