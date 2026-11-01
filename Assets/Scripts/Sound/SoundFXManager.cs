@@ -24,14 +24,14 @@ public class SoundFXManager : MonoBehaviour
             float randomPitch = Random.Range(9, 12) / 10f;
             audioSource.pitch = randomPitch;
 
-            Debug.Log(randomPitch);
+            //Debug.Log(randomPitch);
         }
 
         audioSource.Play();
 
         float clipLength = audioSource.clip.length;
 
-        Destroy(audioSource.gameObject, clipLength);
+        Destroy(audioSource.gameObject, clipLength + 0.1f);
     }
 
     public void PlayRandomSoundFXClip(AudioClip[] audioClip, Transform spawnTransform, float volume, bool isPitched = false) {
@@ -47,13 +47,13 @@ public class SoundFXManager : MonoBehaviour
             float randomPitch = Random.Range(9, 12) / 10f;
             audioSource.pitch = randomPitch;
 
-            Debug.Log(randomPitch);
+            //Debug.Log(randomPitch);
         }
 
         audioSource.Play();
 
         float clipLength = audioSource.clip.length;
 
-        Destroy(audioSource.gameObject, clipLength);
+        Destroy(audioSource.gameObject, clipLength + 0.1f);
     }
 }
