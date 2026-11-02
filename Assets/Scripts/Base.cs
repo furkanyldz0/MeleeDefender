@@ -8,7 +8,7 @@ public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
     public event EventHandler<IHasHealthBar.OnHealthChangedEventArgs> OnHealthChanged;
     public event Action OnDied;
 
-    [SerializeField] private AudioClip[] hitSoundClips;
+    [SerializeField] private AudioClip hitSoundClip;
     [SerializeField] private AudioClip destroySoundClip;
 
     public float Health { get; set; } = 400f; //400f
@@ -50,7 +50,7 @@ public class Base : MonoBehaviour, IDamagable, IHasHealthBar {
         }
 
         damageFlash.CallDamageFlash();
-        SoundFXManager.Instance.PlayRandomSoundFXClip(hitSoundClips, transform, 0.8f, true);
+        SoundFXManager.Instance.PlaySoundFXClip(hitSoundClip, transform, 0.8f, true);
     }
 
     private IEnumerator DelayDie(float duration) {

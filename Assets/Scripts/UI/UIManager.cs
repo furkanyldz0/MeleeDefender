@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using TMPro;
@@ -19,6 +20,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Base baseObject;
 
     private int bestScore;
+    private Vector3 originalScoreTextPosition;
 
     private void Awake() {
         if(Instance != null) {
@@ -36,6 +38,8 @@ public class UIManager : MonoBehaviour
         bestScore = PlayerPrefs.GetInt("BestScore", 0);
         UpdateScore(0);
         //HideGameOverPanel();
+
+        originalScoreTextPosition = scoreText.transform.localPosition;
     }
 
     private void BaseObject_OnDied() {
@@ -48,10 +52,26 @@ public class UIManager : MonoBehaviour
 
     private void LevelManager_OnScoreChanged(int newScore) {
         UpdateScore(newScore);
+
+        AnimateScoreText();
     }
 
     private void UpdateScore(int score) {
         scoreText.SetText(score.ToString());
+    }
+    private void AnimateScoreText() {
+        // Üst üste hýzlý skor kazanýlýrsa animasyonlar birikip kaymasýn diye önce aktif iþlemi bitir
+        scoreText.transform.DOComplete();
+
+        // Skoru Y ekseninde 15 birim yukarý zýplat (YOYO ile geri yerine döner)
+        // SetEase(Ease.OutQuad) yukarý çýkarken yavaþlamasýný, aþaðý düþerken hýzlanmasýný saðlar
+        scoreText.transform.DOLocalMoveY(originalScoreTextPosition.y + 15f, 0.1f)
+            .SetLoops(2, LoopType.Yoyo)
+            .SetEase(Ease.OutSine)
+            .OnComplete(() => {
+                // Her ihtimale karþý animasyon bitince orijinal konumuna kesin olarak oturt
+                scoreText.transform.localPosition = originalScoreTextPosition;
+            });
     }
 
     private void EndGame() {
@@ -100,5 +120,7 @@ public class UIManager : MonoBehaviour
         Player.Instance.GetMelee().OnParried -= ChangeSkillProgress;
         //Player.Instance.OnSkillUsed -= ChangeSkillProgress;
         baseObject.OnDied -= BaseObject_OnDied;
+
+        scoreText.transform.DOKill();
     }
 }

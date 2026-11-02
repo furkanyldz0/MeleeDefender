@@ -75,7 +75,7 @@ MonoBehaviour:
     totalEnemyCount: 3
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
-    bulletSpeed: 8
+    bulletSpeed: 10
     specialEnemies:
     - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
       count: 3
@@ -83,7 +83,7 @@ MonoBehaviour:
     totalEnemyCount: 4
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
-    bulletSpeed: 8
+    bulletSpeed: 10
     specialEnemies:
     - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
       count: 4
@@ -116,6 +116,38 @@ MonoBehaviour:
     enemySpawnTimeOffset: 0.5
     enemyFirstAttackTime: 2
     bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 7
+  - requiredScore: 200
+    totalEnemyCount: 7
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 6
+  - requiredScore: 230
+    totalEnemyCount: 7
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 5
+  - requiredScore: 260
+    totalEnemyCount: 7
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 2
+    bulletSpeed: 15
+    specialEnemies:
+    - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
+      count: 4
+  - requiredScore: 300
+    totalEnemyCount: 7
+    enemySpawnTimeOffset: 0.5
+    enemyFirstAttackTime: 1.5
+    bulletSpeed: 18
     specialEnemies:
     - type: {fileID: 11400000, guid: c6e22d0f8d686204a84ff676618ea9a2, type: 2}
       count: 7

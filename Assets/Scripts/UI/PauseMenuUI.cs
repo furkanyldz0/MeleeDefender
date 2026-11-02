@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
@@ -54,6 +55,11 @@ public class PauseMenuUI : MonoBehaviour
 
     // HERHANGÝ BÝR MENÜYÜ AÇMAK ÝÇÝN BU METODU KULLAN
     private void OpenMenu(GameObject menuToOpen) {
+        // Her menü açýlýþýnda buton üzerindeki görünmez fare/klavye odaðýný temizle
+        if (EventSystem.current != null) {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
+
         // Eðer halihazýrda açýk bir menü varsa, onu gizle
         if (menuStack.Count > 0) {
             menuStack.Peek().SetActive(false);
@@ -66,6 +72,11 @@ public class PauseMenuUI : MonoBehaviour
 
     // BÝR ÖNCEKÝ MENÜYE DÖNMEK ÝÇÝN BU METODU KULLAN
     private void GoBack() {
+        // Her geri dönüþte buton üzerindeki görünmez fare/klavye odaðýný temizle
+        if (EventSystem.current != null) {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
+
         if (menuStack.Count > 0) {
             // Þu anki menüyü yýðýndan çýkar ve kapat
             GameObject currentMenu = menuStack.Pop();

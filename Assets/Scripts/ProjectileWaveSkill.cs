@@ -14,6 +14,7 @@ public class ProjectileWaveSkill : MonoBehaviour {
 
     [SerializeField] private AudioClip skillUsedSoundClip;
     [SerializeField] private AudioClip skillAttackSoundClip;
+    [SerializeField] private AudioClip skillEndSoundClip;
 
     // Yaratýlan efektleri hafýzada tutacaðýmýz referanslar
     private ParticleSystem spawnedActiveEffect;
@@ -115,6 +116,8 @@ public class ProjectileWaveSkill : MonoBehaviour {
         }
 
         spawnedEndEffect.Play();
+
+        SoundFXManager.Instance.PlaySoundFXClip(skillEndSoundClip, transform, 0.8f);
     }
 
     private void OnDestroy() {
