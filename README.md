@@ -9,12 +9,12 @@ Pc build can be accessed from Releases section.
 ## Screenshots
 
 <p align="center">
-  <img src="Images/0.png"><br>
-  <img src="Images/1.png"><br>
-  <img src="Images/2.png"><br>
-  <img src="Images/3.png"><br>
-  <img src="Images/4.png"><br>
-  <img src="Images/5.png"><br>
-  <img src="Images/6.png"><br>
+  <img src="Images/0.png"><br><br>
+  <img src="Images/1.png"><br><br>
+  <img src="Images/2.png"><br><br>
+  <img src="Images/3.png"><br><br>
+  <img src="Images/4.png"><br><br>
+  <img src="Images/5.png"><br><br>
+  <img src="Images/6.png"><br><br>
   <img src="Images/7.png">
 </p>
