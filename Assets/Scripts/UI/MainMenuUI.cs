@@ -59,4 +59,8 @@ public class MainMenuUI : MonoBehaviour
         SoundFXManager.Instance.PlaySoundFXClip(buttonSoundClip, Camera.main.transform, 0.7f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
+
+    public void ExitGame() {
+        Application.Quit();
+    }
 }
